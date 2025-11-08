@@ -109,9 +109,7 @@ export namespace TDD20
 			if (message.empty() == false)
 				m = std::string(" - ") + message;
 
-			auto AddMoreText = [](const std::string& m)
-				{
-					return
+			auto AddMoreText = [](const std::string& m) { return
 #ifdef _CPPRTTI 
 						  std::string("; was expecting exception of type '")
 						+ std::string(typeid(E).name())
@@ -178,8 +176,6 @@ export namespace TDD20
 
 	struct Test : TestRegistrar
 	{
-		std::string name;
-		std::function<void()> func;
-		Test(const std::string& name, std::function<void()> func) : name(name), func(func), TestRegistrar(std::pair{name, func}) {}
+		Test(const std::string& name, std::function<void()> func) : TestRegistrar(std::pair{name, func}) {}
 	};
 }
