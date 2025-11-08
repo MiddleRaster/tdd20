@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	class Matcher
+	class CmdLineMatcher
 	{
 		auto MakeVector(int argc, char* argv[])
 		{
@@ -24,12 +24,12 @@ int main(int argc, char* argv[])
 		}
 		const std::vector<std::string> args;
 	public:
-		Matcher(int argc, char* argv[]) : args(MakeVector(argc, argv)) {}
+		CmdLineMatcher(int argc, char* argv[]) : args(MakeVector(argc, argv)) {}
 		bool WantTest(const std::string& name) const
 		{
 			return args.size() == 0 ? true : args.cend() != std::find(args.cbegin(), args.cend(), name);
 		}
 	};
-	auto [passed, failed] = TDD20::TestRegistrar::RunTests(Matcher{argc, argv}, std::cout);
+	auto [passed, failed] = TDD20::TestRegistrar::RunTests(CmdLineMatcher{argc, argv}, std::cout);
     return 0;
 }
