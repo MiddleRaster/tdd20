@@ -2,7 +2,7 @@ import tdd20;
 using namespace TDD20;
 
 static int x = 42;
-TDD20::Test someMoreTests[] =
+Test someMoreTests[] =
 {
 	{"SomeMoreTests::Initialize",[]{ x = 7;     Assert::AreEqual(7, x); }},
 	{"SomeMoreTests::TestOne",   []{ Assert::Fail("oh, I'm a failure"); }},
@@ -16,13 +16,13 @@ TDD20::Test someMoreTests[] =
 	{"SomeMoreTests::Cleanup",   []{ x = 42;   Assert::AreEqual(42, x); }},
 };
 
-
-namespace MyNamespace {
+namespace MyNamespace
+{
 	enum Color { Red, Green, Blue };
 }
 namespace Detail
 {
-	template <> inline std::string ToString(const MyNamespace::Color& c)
+	template <> inline std::string ToString(const MyNamespace::Color& c) // a custom helper for your own type, enum Color, in this case
 	{
 		switch (c) {
 		case MyNamespace::Red:   return "Red";
@@ -32,7 +32,7 @@ namespace Detail
 		}
 	}
 }
-TDD20::Test yetSomeMore[] =
+Test yetSomeMore[] =
 {
 	{"show how to write a helper for your own type, an enum Color, in this case", []{ Assert::AreEqual(MyNamespace::Red, MyNamespace::Green); } },
 	{"a test with two different types", []{ Assert::AreEqual(42, "42"); } },
@@ -41,5 +41,4 @@ TDD20::Test yetSomeMore[] =
 			Assert::ExpectingException<std::exception>([] { throw 7; }, "and here's my custom message");
 		}
 	},
-	
 };

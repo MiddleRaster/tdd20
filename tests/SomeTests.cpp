@@ -1,7 +1,7 @@
 import tdd20;
 using namespace TDD20;
 
-TDD20::Test someTests[] = 
+Test someTests[] = 
 {
 	{"test two ints", []() { Assert::AreEqual(2, 1); } },
 	{"void* test", 
