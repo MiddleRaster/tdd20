@@ -22,7 +22,7 @@ Tests are auto-registered by code in their base class, ```TestRegistrar```.
 Running the tests is done by calling the static method ```static std::pair<int, int> TestRegistrar::RunTests(auto&& matcher, auto&& out);```.
 There are two customization points:
 1. You can write your own matcher to specify which tests to run; the default matcher runs those tests whose names match any command-line arguments, if any, or else all of them.
-1. You can customize the output by writing your own ```out``` class (must implement ```void operator<<(const std::string&);```.
+1. You can customize the output by writing your own ```out``` class (must implement ```void operator<<(const std::string&);```).
 
 ### How to use:
 
@@ -36,14 +36,15 @@ The supplied ```main.cpp``` has the following command-line options:
 
 <div style="margin-left:40px">
 
-| Method            | Use |
-|:------------------|:-----
-| ```AreEqual```    | compares two values for equality |
-| ```AreNotEqual``` | compares two values for inequality |
-| ```IsTrue```      | compares a value to true |
-| ```IsFalse```     | compares a value to false |
-| ```Fail```        | fails with a message |
-| ```IsWithin```    | compares two doubles for approximate equality within a tolerance |
+| Method                   | Use  |
+|:-------------------------|:-----|
+| ```AreEqual```           | compares two values for equality |
+| ```AreNotEqual```        | compares two values for inequality |
+| ```IsTrue```             | compares a value to true |
+| ```IsFalse```            | compares a value to false |
+| ```Fail```               | fails with a message |
+| ```IsWithin```           | compares two doubles for approximate equality within a tolerance |
+| ```ExpectingException``` | expects a callable to throw an exception of a specified type |
 </div>
 
 ### Future work:
