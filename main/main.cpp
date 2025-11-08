@@ -29,8 +29,7 @@ int main(int argc, char* argv[])
 		{
 			return args.size() == 0 ? true : args.cend() != std::find(args.cbegin(), args.cend(), name);
 		}
-	} matcher(argc, argv);
-
-	auto [passed, failed] = TDD20::TestRegistrar::RunTests(matcher, std::cout);
+	};
+	auto [passed, failed] = TDD20::TestRegistrar::RunTests(Matcher{argc, argv}, std::cout);
     return 0;
 }
