@@ -12,7 +12,7 @@ namespace Detail
 	export template<typename T> inline std::string ToString(const T*) { static_assert(false, "test writer must write a specialization for this type"); }
 	export template<typename T> inline std::string ToString(      T*) { static_assert(false, "test writer must write a specialization for this type"); }
 
-	template <> inline std::string ToString(const bool& t)              { return std::to_string(t); }
+	template <> inline std::string ToString(const bool& t)              { return t ? "true" : "false"; }
 	template <> inline std::string ToString(const int& t)               { return std::to_string(t); }
 	template <> inline std::string ToString(const long& t)              { return std::to_string(t); }
 	template <> inline std::string ToString(const long long& t)         { return std::to_string(t); }
@@ -61,8 +61,7 @@ export namespace TDD20
 		{
 			std::string Expected = Detail::ToString(expected);
 			std::string Actual   = Detail::ToString(actual);
-			if (Expected != Actual)
-			{
+			if (Expected != Actual) {
 				std::string msg = "Expected <";
 				msg += Expected;
 				msg += "> Actual <";
@@ -78,8 +77,7 @@ export namespace TDD20
 		template<typename S, typename T> static void AreNotEqual(const S& expected, const T& actual, const std::string& message="", std::source_location loc=std::source_location::current())
 		{
 			std::string Actual = Detail::ToString(actual);
-			if (Detail::ToString(expected) == Actual)
-			{
+			if (Detail::ToString(expected) == Actual) {
 				std::string msg = "Unexpected equality <";
 				msg += Actual;
 				msg += ">";
@@ -137,10 +135,9 @@ export namespace TDD20
 		static std::pair<int, int> RunTests(auto&& matcher, auto&& out)
 		{
 			auto CreateVisualStudioCompatibleMessage = [](const std::string& name, const std::string& file, int line, const std::string& what) -> std::string
-														{ return file + "(" + std::to_string(line) + ") : warning unit-test : \"" + name + "\" failed with: " + what + "\n"; };
+														{ return file + "(" + std::to_string(line) + ") : warning unit-test: \"" + name + "\" failed with: " + what + "\n"; };
 			int passed = 0, failed = 0;
-			for (auto& [name, func] : GetTests())
-			{
+			for (auto& [name, func] : GetTests()) {
 				if (false == matcher.WantTest(name))
 					continue;
 
@@ -154,12 +151,7 @@ export namespace TDD20
 				catch (...)                      { out << CreateVisualStudioCompatibleMessage(name, "?",    1,      "unknown exception caught"); }
 				++failed;
 			}
-
-			// summary
-			std::ostringstream oss;
-			oss << "\n" << failed << " failure(s) out of " << (passed + failed) << " test(s) run\n\n";
-			out << oss.str();
-
+			out << "\n" + std::to_string(failed) + " failure(s) out of " + std::to_string(passed + failed) + " test(s) run\n\n"; // output summary
 			return {passed, failed};
 		}
 		TestRegistrar(std::pair<std::string, std::function<void()>>&& test)
