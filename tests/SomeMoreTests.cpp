@@ -20,7 +20,7 @@ namespace MyNamespace
 {
 	enum Color { Red, Green, Blue };
 }
-namespace Detail
+namespace TDD20
 {
 	template <> inline std::string ToString(const MyNamespace::Color& c) // a custom helper for your own type, enum Color, in this case
 	{

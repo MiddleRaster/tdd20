@@ -6,47 +6,28 @@ export module tdd20;
 
 import std;
 
-namespace Detail
+export namespace TDD20
 {
-	export template<typename T> inline std::string ToString(const T&) { static_assert(false, "test writer must write a specialization for this type"); }
-	export template<typename T> inline std::string ToString(const T*) { static_assert(false, "test writer must write a specialization for this type"); }
-	export template<typename T> inline std::string ToString(      T*) { static_assert(false, "test writer must write a specialization for this type"); }
-
-	template <> inline std::string ToString(const bool& t)              { return t ? "true" : "false"; }
-	template <> inline std::string ToString(const int& t)               { return std::to_string(t); }
-	template <> inline std::string ToString(const long& t)              { return std::to_string(t); }
-	template <> inline std::string ToString(const long long& t)         { return std::to_string(t); }
-	template <> inline std::string ToString(const short& t)             { return std::to_string(t); }
-	template <> inline std::string ToString(const char& t)              { return std::to_string(t); }
-	template <> inline std::string ToString(const signed char& t)       { return std::to_string(t); }
-	template <> inline std::string ToString(const unsigned int& t)      { return std::to_string(t); }
-	template <> inline std::string ToString(const unsigned long& t)     { return std::to_string(t); }
-	template <> inline std::string ToString(const unsigned long long& t){ return std::to_string(t); }
-	template <> inline std::string ToString(const float& t)             { return std::to_string(t); }
-	template <> inline std::string ToString(const double& t)            { return std::to_string(t); }
-	template <> inline std::string ToString(const unsigned short& t)    { return std::to_string(t); }
-	template <> inline std::string ToString(const unsigned char& t)     { return std::to_string(t); }
-	
-	template <> inline std::string ToString(const std::string& t)       { return std::string(t); }
-	template <> inline std::string ToString(const char* t)              { return std::string(t); }
-	template <> inline std::string ToString(      void* t)
-	{
+	template<typename T> inline std::string ToString(const T&) { static_assert(false, "test writer must write a specialization for this type"); }
+	template<typename T> inline std::string ToString(T* t)
+	{	// for generic pointer types, return hex value of address
 		std::ostringstream oss;
-		oss << "0x" << std::uppercase << std::hex << reinterpret_cast<long long>(t);
+		oss << "0x" << std::uppercase << std::hex << reinterpret_cast<std::uintptr_t>(t);
 		return oss.str();
 	}
-	template <> inline std::string ToString(const std::wstring& t)
+	                                inline std::string ToString(const         bool& t) { return t ? "true" : "false"; } // N.B.: an overload, not a specialization
+	template<std::integral       T> inline std::string ToString(const            T& t) { return std::to_string(t); }
+	template<std::floating_point T> inline std::string ToString(const            T& t) { return std::to_string(t); }
+	template <>                     inline std::string ToString(const  std::string& t) { return t; }
+	template <>                     inline std::string ToString(const         char* t) { return std::string(t); }
+	template <>                     inline std::string ToString(const std::wstring& t)
 	{
 		std::string s;
-		for (wchar_t wc : t)
-			s.push_back(static_cast<char>(wc)); // lossy: drops high bits
+		std::transform(t.begin(), t.end(), std::back_inserter(s), [](wchar_t wc) { return static_cast<char>(wc); }); // lossy: drops high bits
 		return s;
 	}
 	template <> inline std::string ToString(const wchar_t* t) { return ToString(std::wstring(t)); }
-}
 
-export namespace TDD20
-{
 	struct AssertException : public std::exception
 	{
 		std::string message, file;
@@ -59,8 +40,8 @@ export namespace TDD20
 		static void Fail(const std::string& msg="", std::source_location loc=std::source_location::current()) { throw AssertException(msg, loc.line(), loc.file_name()); }
 		template<typename S, typename T> static void AreEqual(const S& expected, const T& actual, const std::string& message="", std::source_location loc=std::source_location::current())
 		{
-			std::string Expected = Detail::ToString(expected);
-			std::string Actual   = Detail::ToString(actual);
+			std::string Expected = ToString(expected);
+			std::string Actual   = ToString(actual);
 			if (Expected != Actual) {
 				std::string msg = "Expected <";
 				msg += Expected;
@@ -76,8 +57,8 @@ export namespace TDD20
 		}
 		template<typename S, typename T> static void AreNotEqual(const S& expected, const T& actual, const std::string& message="", std::source_location loc=std::source_location::current())
 		{
-			std::string Actual = Detail::ToString(actual);
-			if (Detail::ToString(expected) == Actual) {
+			std::string Actual = ToString(actual);
+			if (ToString(expected) == Actual) {
 				std::string msg = "Unexpected equality <";
 				msg += Actual;
 				msg += ">";
@@ -91,7 +72,7 @@ export namespace TDD20
 		static void AreWithin(double expected, double actual, double tolerance, const std::string& message="", std::source_location loc=std::source_location::current())
 		{
 			if (std::fabs(expected - actual) > tolerance) {
-				std::string msg = "Expected <" + Detail::ToString(expected) + "> to be within <" + Detail::ToString(tolerance) + "> of <" + Detail::ToString(actual) + ">";
+				std::string msg = "Expected <" + ToString(expected) + "> to be within <" + ToString(tolerance) + "> of <" + ToString(actual) + ">";
 				if (message.empty() == false) {
 					msg += " - ";
 					msg += message;

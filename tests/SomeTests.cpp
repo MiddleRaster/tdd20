@@ -19,5 +19,6 @@ Test someTests[] =
 	{"an IsWithin test",                                               []{ Assert::AreWithin  (3.14159, 3.14, 0.0001, "not close enough"); } },
 	{"an IsFalse test",                                                []{ Assert::IsFalse    (true,  "this should be false"); } },
 	{"an IsTrue test",                                                 []{ Assert::IsTrue     (false, "this should be true" ); } },
-	{"trying out Detail::ToString",                                    []{ Assert::AreEqual   (Detail::ToString(false), Detail::ToString(true)); }},
+	{"trying out TDD20::ToString",                                     []{ Assert::AreEqual   (ToString(false), ToString(true)); } },
+	{"trying out wide string conversion",                              []{ Assert::AreEqual   (L"hello", "hello"); } },
 };
