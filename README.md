@@ -30,7 +30,7 @@ There are two customization points:
 
 ### How to use:
 
-See examples in the **SampleTests** folder for how to write tests.
+See examples in the **tests** folder for how to write tests.
 The supplied ```main.cpp``` has the following command-line options:
  - -dump or /dump: dumps all registered test names and exits.
  - the name of one or more tests:  e.g., ```tdd20.exe "SomeMoreTests::TestSeven" "test two ints"```.
