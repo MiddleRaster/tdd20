@@ -12,8 +12,8 @@ A macro-free, module-only TDD/unit testing harness for C++20 or later.
 1. Flexible and extensible
 
 ### The folder structure:
-1. **main** contains the main entry point.
-1. **module** contains the single .ixx file for the test harness.
+1. **main** contains the main() entry point.
+1. **module** contains the single module interface file for the test harness.
 1. **tests** contains a few sample tests, most of which report errors.
 
 ### How it works:
@@ -50,6 +50,11 @@ The supplied ```main.cpp``` has the following command-line options:
 | ```IsWithin```           | compares two doubles for approximate equality within a tolerance |
 | ```ExpectingException``` | expects a callable to throw an exception of a specified type |
 </div>
+
+### Running the tests:
+After building the project, you may add the executable as a post-build step, if you so desire.
+The output will be captured by Visual Studio and shown in the "Error List" and "Output" windows, as ***warnings***.
+Double-clicking on one will take you to the corresponding line in the source code.
 
 ### Future work:
 Eventually, I'll write a GUI version and
