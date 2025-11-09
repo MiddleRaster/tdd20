@@ -137,13 +137,7 @@ export namespace TDD20
 		static std::pair<int, int> RunTests(auto&& matcher, auto&& out)
 		{
 			auto CreateVisualStudioCompatibleMessage = [](const std::string& name, const std::string& file, int line, const std::string& what) -> std::string
-				{
-					std::ostringstream oss;
-					oss << "Failure in: \"" << name << "\"\n";
-					oss << file << "(" << line << ") : ERROR : \"" << what << "\"\n";
-					return oss.str();
-				};
-
+														{ return file + "(" + std::to_string(line) + ") : warning unit-test : \"" + name + "\" failed with: " + what + "\n"; };
 			int passed = 0, failed = 0;
 			for (auto& [name, func] : GetTests())
 			{
@@ -155,15 +149,15 @@ export namespace TDD20
 					++passed;
 					continue;
 				}
-				catch (const AssertException& e) { out << CreateVisualStudioCompatibleMessage(name, e.file,    e.line, e.what()); }
-				catch (const std::exception & e) { out << CreateVisualStudioCompatibleMessage(name, "unknown_file", 0, e.what()); }
-				catch (...)                      { out << CreateVisualStudioCompatibleMessage(name, "unknown_file", 0, "unknown exception thrown"); }
+				catch (const AssertException& e) { out << CreateVisualStudioCompatibleMessage(name, e.file, e.line, e.what()); }
+				catch (const std::exception & e) { out << CreateVisualStudioCompatibleMessage(name, "?",    1,      e.what()); }
+				catch (...)                      { out << CreateVisualStudioCompatibleMessage(name, "?",    1,      "unknown exception caught"); }
 				++failed;
 			}
 
 			// summary
 			std::ostringstream oss;
-			oss << failed << " failure(s) out of " << (passed + failed) << " test(s) run\n";
+			oss << "\n" << failed << " failure(s) out of " << (passed + failed) << " test(s) run\n\n";
 			out << oss.str();
 
 			return {passed, failed};
