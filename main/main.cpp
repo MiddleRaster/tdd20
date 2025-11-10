@@ -7,7 +7,7 @@ int main(int argc, char* argv[])
 	{
 		struct Dumper { bool WantTest  (const std::string& name) const { std::cout << name << "\n"; return false; } };
 		struct Noop   { void operator<<(const std::string&) {} };
-		TDD20::TestRegistrar::RunTests(Dumper{}, Noop{});
+		TDD20::Test::RunTests(Dumper{}, Noop{});
 		return 0;
 	}
 
@@ -18,6 +18,6 @@ int main(int argc, char* argv[])
 		CmdLineMatcher(int argc, char* argv[]) : args(argv+1, argv+argc) {}
 		bool WantTest(const std::string& name) const { return args.size() == 0 ? true : args.cend() != std::find(args.cbegin(), args.cend(), name); }
 	};
-	auto [passed, failed] = TDD20::TestRegistrar::RunTests(CmdLineMatcher{argc, argv}, std::cout);
+	auto [passed, failed] = TDD20::Test::RunTests(CmdLineMatcher{argc, argv}, std::cout);
     return 0;
 }

@@ -102,7 +102,7 @@ export namespace TDD20
 		}
 	};
 
-	struct TestRegistrar
+	struct Test
 	{
 		static auto& GetTests()
 		{
@@ -131,14 +131,9 @@ export namespace TDD20
 			out << "\n" + std::to_string(failed) + " failure(s) out of " + std::to_string(passed + failed) + " test(s) run\n\n"; // output summary
 			return {passed, failed};
 		}
-		TestRegistrar(std::pair<std::string, std::function<void()>>&& test)
+		Test(const std::string& name, std::function<void()> func)
 		{
-			GetTests().push_back(test);
+			GetTests().push_back(std::pair{name, func});
 		}
-	};
-
-	struct Test : TestRegistrar
-	{
-		Test(const std::string& name, std::function<void()> func) : TestRegistrar(std::pair{name, func}) {}
 	};
 }
