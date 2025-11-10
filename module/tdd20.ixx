@@ -48,10 +48,8 @@ export namespace TDD20
 				msg += "> Actual <";
 				msg += Actual;
 				msg += ">";
-				if (message.empty() == false) {
-					msg += " - ";
-					msg += message;
-				}
+				if (message.empty() == false)
+					msg += " - " + message;
 				throw AssertException(msg, loc.line(), loc.file_name());
 			}
 		}
@@ -62,10 +60,8 @@ export namespace TDD20
 				std::string msg = "Unexpected equality <";
 				msg += Actual;
 				msg += ">";
-				if (message.empty() == false) {
-					msg += " - ";
-					msg += message;
-				}
+				if (message.empty() == false)
+					msg += " - " + message;
 				throw AssertException(msg, loc.line(), loc.file_name());
 			}
 		}
