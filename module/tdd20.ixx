@@ -33,7 +33,7 @@ export namespace TDD20
 		std::string message, file;
 		int line;
 		AssertException(const std::string& msg, int line, const std::string& file) : message(msg), line(line), file(file) {}
-		virtual const char* what() const noexcept override { return message.c_str(); }
+		const char* what() const noexcept override { return message.c_str(); }
 	};
 	struct Assert
 	{
