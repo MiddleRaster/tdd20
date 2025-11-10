@@ -40,14 +40,9 @@ export namespace TDD20
 		static void Fail(const std::string& msg="", std::source_location loc=std::source_location::current()) { throw AssertException(msg, loc.line(), loc.file_name()); }
 		template<typename S, typename T> static void AreEqual(const S& expected, const T& actual, const std::string& message="", std::source_location loc=std::source_location::current())
 		{
-			std::string Expected = ToString(expected);
-			std::string Actual   = ToString(actual);
+			std::string Expected{ToString(expected)}, Actual{ToString(actual)};
 			if (Expected != Actual) {
-				std::string msg = "Expected <";
-				msg += Expected;
-				msg += "> Actual <";
-				msg += Actual;
-				msg += ">";
+				std::string msg = "Expected <" + Expected + "> Actual <" + Actual + ">";
 				if (message.empty() == false)
 					msg += " - " + message;
 				throw AssertException(msg, loc.line(), loc.file_name());
@@ -57,9 +52,7 @@ export namespace TDD20
 		{
 			std::string Actual = ToString(actual);
 			if (ToString(expected) == Actual) {
-				std::string msg = "Unexpected equality <";
-				msg += Actual;
-				msg += ">";
+				std::string msg = "Unexpected equality <" + Actual + ">";
 				if (message.empty() == false)
 					msg += " - " + message;
 				throw AssertException(msg, loc.line(), loc.file_name());
@@ -80,20 +73,12 @@ export namespace TDD20
 		static void IsTrue (bool actual, const std::string& message="", std::source_location loc=std::source_location::current()) { AreEqual(true,  actual, message, loc); }
 		template <typename E, typename L> static void ExpectingException(L l, const std::string& message=std::string(), std::source_location loc = std::source_location::current())
 		{
-			std::string m;
-			if (message.empty() == false)
-				m = std::string(" - ") + message;
-
-			auto AddMoreText = [](const std::string& m) { return
-#ifdef _CPPRTTI 
-						  std::string("; was expecting exception of type '")
-						+ std::string(typeid(E).name())
-						+ std::string("'")
+#ifdef _CPPRTTI
+			auto AddMoreText = [](const std::string& m) { return std::string("; was expecting exception of type '") + std::string(typeid(E).name()) + std::string("'") + m; };
 #else
-						std::string(" (RTTI is turned off otherwise the expected exception type would be displayed here)")
+			auto AddMoreText = [](const std::string& m) { return std::string(" (RTTI is turned off otherwise the expected exception type would be displayed here)") + m; };
 #endif
-						+ m;
-				};
+			std::string m = message.empty() ? "" : std::string(" - ") + message;
 
 			try { l(); }
 			catch (const E&) { return; }
