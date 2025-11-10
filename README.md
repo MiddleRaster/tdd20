@@ -17,12 +17,11 @@ A macro-free, module-only TDD/unit testing harness for C++20 or later.
 1. **tests** contains some sample tests, a few of which report errors.
 
 ### How it works:
-A "test" is an instance of the ```Test``` struct that holds a name and a ````std::function<void()>```` representing the test body;
+A test is an instance of the ```Test``` struct that holds onto the name and a ````std::function<void()>```` representing the test body;
 you'll probably want to use a lambda.
-Tests are typically held in one ore more arrays and 
-are auto-registered by code in their base class, ```TestRegistrar```.
+Tests are typically held in one or more arrays and are auto-registered.
 Running the tests is done by calling the static
-method ```static std::pair<int, int> TestRegistrar::RunTests(auto&& matcher, auto&& out);```.
+method ```static std::pair<int, int> Test::RunTests(auto&& matcher, auto&& out);```.
 
 There are two customization points:
 1. You can write your own matcher to specify which tests to run; the default matcher runs those tests whose names match any command-line arguments, if any, or else all of them.
