@@ -42,9 +42,7 @@ export namespace TDD20
 		{
 			std::string Expected{ToString(expected)}, Actual{ToString(actual)};
 			if (Expected != Actual) {
-				std::string msg = "Expected <" + Expected + "> Actual <" + Actual + ">";
-				if (message.empty() == false)
-					msg += " - " + message;
+				std::string msg = std::format("Expected <{}> Actual <{}>{}", Expected, Actual, message.empty() ? "" : " - " + message);
 				throw AssertException(msg, loc.line(), loc.file_name());
 			}
 		}
@@ -52,20 +50,14 @@ export namespace TDD20
 		{
 			std::string Actual = ToString(actual);
 			if (ToString(expected) == Actual) {
-				std::string msg = "Unexpected equality <" + Actual + ">";
-				if (message.empty() == false)
-					msg += " - " + message;
+				std::string msg = std::format("Unexpected equality <{}>{}", Actual, message.empty() ? "" : " - " + message);
 				throw AssertException(msg, loc.line(), loc.file_name());
 			}
 		}
 		static void AreWithin(double expected, double actual, double tolerance, const std::string& message="", std::source_location loc=std::source_location::current())
 		{
 			if (std::fabs(expected - actual) > tolerance) {
-				std::string msg = "Expected <" + ToString(expected) + "> to be within <" + ToString(tolerance) + "> of <" + ToString(actual) + ">";
-				if (message.empty() == false) {
-					msg += " - ";
-					msg += message;
-				}
+				std::string msg = std::format("Expected <{}> to be within <{}> of <{}>{}", ToString(expected), ToString(tolerance), ToString(actual), message.empty() ? "" : " - " + message);
 				throw AssertException(msg, loc.line(), loc.file_name());
 			}
 		}
