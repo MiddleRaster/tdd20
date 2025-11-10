@@ -24,10 +24,10 @@
     <ClCompile Include="tests\SomeMoreTests.cpp">
       <Filter>tests</Filter>
     </ClCompile>
-    <ClCompile Include="ToStringTests.cpp">
+    <ClCompile Include="tests\AssertTests.cpp">
       <Filter>tests</Filter>
     </ClCompile>
-    <ClCompile Include="AssertTests.cpp">
+    <ClCompile Include="tests\ToStringTests.cpp">
       <Filter>tests</Filter>
     </ClCompile>
   </ItemGroup>
