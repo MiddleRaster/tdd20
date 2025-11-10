@@ -1,19 +1,19 @@
 import tdd20;
 using namespace TDD20;
 
-static int x = 42;
-Test someMoreTests[] =
+static void* p = nullptr;
+Test demoingInitializationAndCleanup[] =
 {
-	{"SomeMoreTests::Initialize",[]{ x = 7;     Assert::AreEqual(7, x); }},
-	{"SomeMoreTests::TestOne",   []{ Assert::Fail("oh, I'm a failure"); }},
-	{"SomeMoreTests::TestTwo",   []{ Assert::Fail("oh, I'm a failure"); }},
-	{"SomeMoreTests::TestThree", []{ Assert::Fail("oh, I'm a failure"); }},
-	{"SomeMoreTests::TestFour",  []{ Assert::Fail("oh, I'm a failure"); }},
-	{"SomeMoreTests::TestFive",  []{ Assert::Fail("oh, I'm a failure"); }},
-	{"SomeMoreTests::TestSix",   []{ Assert::Fail("oh, I'm a failure"); }},
-	{"SomeMoreTests::TestSeven", []{ Assert::Fail("oh, I'm a failure"); }},
-	{"SomeMoreTests::TestEight", []{ Assert::Fail("oh, I'm a failure"); }},
-	{"SomeMoreTests::Cleanup",   []{ x = 42;   Assert::AreEqual(42, x); }},
+	{"SomeMoreTests::Initialize",[]{ p = ::operator new(7); }},
+	{"SomeMoreTests::TestOne",   []{ }},
+	{"SomeMoreTests::TestTwo",   []{ }},
+	{"SomeMoreTests::TestThree", []{ }},
+	{"SomeMoreTests::TestFour",  []{ }},
+	{"SomeMoreTests::TestFive",  []{ }},
+	{"SomeMoreTests::TestSix",   []{ }},
+	{"SomeMoreTests::TestSeven", []{ }},
+	{"SomeMoreTests::TestEight", []{ }},
+	{"SomeMoreTests::Cleanup",   []{ ::operator delete(p); }},
 };
 
 namespace MyNamespace
@@ -32,13 +32,9 @@ namespace TDD20
 		}
 	}
 }
-Test yetSomeMore[] =
+Test demoingCustomToStringForAUserDefinedType[] =
 {
-	{"show how to write a helper for your own type, an enum Color, in this case", []{ Assert::AreEqual(MyNamespace::Red, MyNamespace::Green); } },
-	{"a test with two different types", []{ Assert::AreEqual(42, "42"); } },
-	{"a test for an expected exception", 
-		[](){
-			Assert::ExpectingException<std::exception>([] { throw 7; }, "and here's my custom message");
-		}
-	},
+	{"show how to write a helper for your own type, an enum Color, in this case", [] { Assert::AreEqual(MyNamespace::Red, "Red"); }},
 };
+
+Test aTestNeedNotBePartOfArray("a test with two different types", []() { Assert::AreEqual(42, "42"); });

@@ -17,7 +17,7 @@ export namespace TDD20
 	}
 	                                inline std::string ToString(const         bool& t) { return t ? "true" : "false"; } // N.B.: an overload, not a specialization
 	template<std::integral       T> inline std::string ToString(const            T& t) { return std::to_string(t); }
-	template<std::floating_point T> inline std::string ToString(const            T& t) { return std::to_string(t); }
+	template<std::floating_point T> inline std::string ToString(const            T& t) { return std::format("{:.15f}", t); } // N.B.: 15 digits of precision
 	template <>                     inline std::string ToString(const  std::string& t) { return t; }
 	template <>                     inline std::string ToString(const         char* t) { return std::string(t); }
 	template <>                     inline std::string ToString(const std::wstring& t)

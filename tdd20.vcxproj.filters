@@ -24,6 +24,12 @@
     <ClCompile Include="tests\SomeMoreTests.cpp">
       <Filter>tests</Filter>
     </ClCompile>
+    <ClCompile Include="ToStringTests.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="AssertTests.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
