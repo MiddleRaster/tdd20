@@ -89,7 +89,7 @@ export namespace TDD20
 		static std::pair<int, int> RunTests(auto&& matcher, auto&& out)
 		{
 			auto CreateVisualStudioCompatibleMessage = [](const std::string& name, const std::string& file, int line, const std::string& what) -> std::string
-														{ return file + "(" + std::to_string(line) + ") : warning unit-test: \"" + name + "\" failed with: " + what + "\n"; };
+														{ return std::format("{}({}) : warning unit-test: \"{}\" failed with: {}\n", file, line, name, what ); };
 			int passed = 0, failed = 0;
 			for (auto& [name, func] : GetTests()) {
 				if (false == matcher.WantTest(name))
@@ -105,12 +105,9 @@ export namespace TDD20
 				catch (...)                      { out << CreateVisualStudioCompatibleMessage(name, "?",    1,      "unknown exception caught"); }
 				++failed;
 			}
-			out << "\n" + std::to_string(failed) + " failure(s) out of " + std::to_string(passed + failed) + " test(s) run\n\n"; // output summary
+			out << std::format("\n{} failure(s) out of {} test(s) run\n\n", failed, passed + failed); // output summary
 			return {passed, failed};
 		}
-		Test(const std::string& name, std::function<void()> func)
-		{
-			GetTests().push_back(std::pair{name, func});
-		}
+		Test(const std::string& name, std::function<void()> func) { GetTests().push_back(std::pair{name, func}); }
 	};
 }
