@@ -22,8 +22,8 @@
     <ClCompile Include="main\main.cpp" />
     <ClCompile Include="module\tdd20.ixx" />
     <ClCompile Include="tests\AssertTests.cpp" />
-    <ClCompile Include="tests\SomeMoreTests.cpp" />
-    <ClCompile Include="tests\SomeTests.cpp" />
+    <ClCompile Include="tests\ShowcaseCapabilitiesTests.cpp" />
+    <ClCompile Include="tests\SomeFailingTests.cpp" />
     <ClCompile Include="tests\ToStringTests.cpp" />
   </ItemGroup>
   <ItemGroup>
