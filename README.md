@@ -14,7 +14,7 @@ A macro-free, module-only TDD/unit testing harness for C++20 or later.
 ### The folder structure:
 1. **main** contains the main() entry point.
 1. **module** contains the single module interface file for the test harness.
-1. **tests** contains a few sample tests, most of which report errors.
+1. **tests** contains some sample tests, a few of which report errors.
 
 ### How it works:
 A "test" is an instance of the ```Test``` struct that holds a name and a ````std::function<void()>```` representing the test body;
