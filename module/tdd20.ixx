@@ -30,8 +30,8 @@ export namespace TDD20
 
 	struct AssertException : public std::exception
 	{
-		std::string message, file;
-		int line;
+		const std::string message, file;
+		const int line;
 		AssertException(const std::string& msg, int line, const std::string& file) : message(msg), line(line), file(file) {}
 		const char* what() const noexcept override { return message.c_str(); }
 	};
@@ -66,7 +66,7 @@ export namespace TDD20
 		template <typename E, typename L> static void ExpectingException(L l, const std::string& message=std::string(), std::source_location loc = std::source_location::current())
 		{
 #ifdef _CPPRTTI
-			auto AddMoreText = [](const std::string& m) { return std::string("; was expecting exception of type '") + std::string(typeid(E).name()) + std::string("'") + m; };
+			auto AddMoreText = [](const std::string& m) { return std::format("; was expecting exception of type '{}'{}", typeid(E).name(), m); };
 #else
 			auto AddMoreText = [](const std::string& m) { return std::string(" (RTTI is turned off otherwise the expected exception type would be displayed here)") + m; };
 #endif
