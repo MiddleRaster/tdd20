@@ -8,13 +8,8 @@ import std;
 
 export namespace TDD20
 {
-	template<typename T> inline std::string ToString(const T&) { static_assert(sizeof(T) == 0, "test writer must write a specialization for this type"); }
-	template<typename T> inline std::string ToString(T* t)
-	{	// for generic pointer types, return hex value of address
-		std::ostringstream oss;
-		oss << "0x" << std::uppercase << std::hex << reinterpret_cast<std::uintptr_t>(t);
-		return oss.str();
-	}
+	template<typename T> inline std::string ToString(const   T&  ) { static_assert(sizeof(T) == 0, "test writer must write a specialization for this type"); }
+	template<typename T> inline std::string ToString(        T* t) { return std::format("0x{:X}", reinterpret_cast<std::uintptr_t>(t)); }
 	template<std::integral       T> inline std::string ToString(const T& t) { return std::to_string(t); }
 	template<std::floating_point T> inline std::string ToString(const T& t) { return std::format("{:.15f}", t); } // N.B.: 15 digits of precision
 	            inline std::string ToString(const         bool& t) { return t ? "true" : "false"; } // N.B.: an overload, not a specialization
