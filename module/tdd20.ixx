@@ -41,25 +41,19 @@ export namespace TDD20
 		template<typename S, typename T> static void AreEqual(const S& expected, const T& actual, const std::string& message="", std::source_location loc=std::source_location::current())
 		{
 			std::string Expected{ToString(expected)}, Actual{ToString(actual)};
-			if (Expected != Actual) {
-				std::string msg = std::format("Expected <{}> Actual <{}>{}", Expected, Actual, message.empty() ? "" : " - " + message);
-				throw AssertException(msg, loc.line(), loc.file_name());
-			}
+			if (Expected != Actual)
+				throw AssertException(std::format("Expected <{}> Actual <{}>{}", Expected, Actual, message.empty() ? "" : " - " + message), loc.line(), loc.file_name());
 		}
 		template<typename S, typename T> static void AreNotEqual(const S& expected, const T& actual, const std::string& message="", std::source_location loc=std::source_location::current())
 		{
 			std::string Actual = ToString(actual);
-			if (ToString(expected) == Actual) {
-				std::string msg = std::format("Unexpected equality <{}>{}", Actual, message.empty() ? "" : " - " + message);
-				throw AssertException(msg, loc.line(), loc.file_name());
-			}
+			if (ToString(expected) == Actual)
+				throw AssertException(std::format("Unexpected equality <{}>{}", Actual, message.empty() ? "" : " - " + message), loc.line(), loc.file_name());
 		}
 		static void AreWithin(double expected, double actual, double tolerance, const std::string& message="", std::source_location loc=std::source_location::current())
 		{
-			if (std::fabs(expected - actual) > tolerance) {
-				std::string msg = std::format("Expected <{}> to be within <{}> of <{}>{}", ToString(expected), ToString(tolerance), ToString(actual), message.empty() ? "" : " - " + message);
-				throw AssertException(msg, loc.line(), loc.file_name());
-			}
+			if (std::fabs(expected - actual) > tolerance)
+				throw AssertException(std::format("Expected <{}> to be within <{}> of <{}>{}", ToString(expected), ToString(tolerance), ToString(actual), message.empty() ? "" : " - " + message), loc.line(), loc.file_name());
 		}
 		static void IsFalse(bool actual, const std::string& message="", std::source_location loc=std::source_location::current()) { AreEqual(false, actual, message, loc); }
 		static void IsTrue (bool actual, const std::string& message="", std::source_location loc=std::source_location::current()) { AreEqual(true,  actual, message, loc); }
