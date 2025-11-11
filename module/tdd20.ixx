@@ -8,15 +8,21 @@ import std;
 
 export namespace TDD20
 {
-	template<typename T> inline std::string ToString(const   T&  ) { static_assert(sizeof(T) == 0, "test writer must write a specialization for this type"); }
-	template<typename T> inline std::string ToString(        T* t) { return std::format("0x{:X}", reinterpret_cast<std::uintptr_t>(t)); }
+	template<typename T>			inline std::string ToString(const   T&  ) { static_assert(sizeof(T) == 0, "test writer must write a specialization for this type"); }
+	template<typename T>			inline std::string ToString(        T* t) { return std::format("0x{:X}", reinterpret_cast<std::uintptr_t>(t)); }
 	template<std::integral       T> inline std::string ToString(const T& t) { return std::to_string(t); }
-	template<std::floating_point T> inline std::string ToString(const T& t) { return std::format("{:.15f}", t); } // N.B.: 15 digits of precision
-	            inline std::string ToString(const         bool& t) { return t ? "true" : "false"; } // N.B.: an overload, not a specialization
-	template <> inline std::string ToString(const  std::string& t) { return t; }
-	template <> inline std::string ToString(const         char* t) { return std::string(t); }
-	template <> inline std::string ToString(const std::wstring& t) { return std::accumulate(t.cbegin(), t.cend(), std::string(), [](auto s, wchar_t wc) { return s + static_cast<char>(wc); }); } //N.B.: lossy - drops high bits
-	template <> inline std::string ToString(const      wchar_t* t) { return ToString(std::wstring(t)); }
+	template<std::floating_point T> inline std::string ToString(const T& t) { return std::format("{:.15f}", t); }		// 15 digits of precision
+									inline std::string ToString(const         bool& t) { return t ? "true" : "false"; }	// an overload, not a specialization
+	template <>						inline std::string ToString(const  std::string& t) { return t; }
+	template <>						inline std::string ToString(const         char* t) { return std::string(t); }
+	template <>						inline std::string ToString(const std::wstring& t)
+	{
+		std::string s;
+		for (wchar_t wc : t)
+			s += static_cast<char>(wc); // lossy:  drops high bits
+		return s;
+	}
+	template <>						inline std::string ToString(const      wchar_t* t) { return ToString(std::wstring(t)); }
 
 	struct AssertException : public std::exception
 	{
@@ -65,8 +71,6 @@ export namespace TDD20
 		}
 		static std::pair<int, int> RunTests(auto&& matcher, auto&& out)
 		{
-			auto CreateVisualStudioCompatibleMessage = [](const std::string& name, const std::string& file, int line, const std::string& what) -> std::string
-														{ return std::format("{}({}) : warning unit-test: \"{}\" failed with: {}\n", file, line, name, what ); };
 			int passed = 0, failed = 0;
 			for (auto& [name, func] : GetTests()) {
 				if (false == matcher.WantTest(name))
@@ -77,12 +81,12 @@ export namespace TDD20
 					++passed;
 					continue;
 				}
-				catch (const AssertException& e) { out << CreateVisualStudioCompatibleMessage(name, e.file, e.line, e.what()); }
-				catch (const std::exception & e) { out << CreateVisualStudioCompatibleMessage(name, "?",    1,      e.what()); }
-				catch (...)                      { out << CreateVisualStudioCompatibleMessage(name, "?",    1,      "unknown exception caught"); }
+				catch (const AssertException& e) { out << std::format("{}({}) : warning unit-test: \"{}\" failed with: {}\n", e.file, e.line, name, e.what()); }
+				catch (const std::exception & e) { out << std::format("{}({}) : warning unit-test: \"{}\" failed with: {}\n",    "?",      1, name, e.what()); }
+				catch (...)                      { out << std::format("{}({}) : warning unit-test: \"{}\" failed with: {}\n",    "?",      1, name, "unknown exception caught"); }
 				++failed;
 			}
-			out << std::format("\n{} failure(s) out of {} test(s) run\n\n", failed, passed + failed); // output summary
+			out << std::format("\n{} failure(s) out of {} test(s) run\n\n", failed, passed + failed);
 			return {passed, failed};
 		}
 		Test(const std::string& name, std::function<void()> func) { GetTests().push_back(std::pair{name, func}); }
