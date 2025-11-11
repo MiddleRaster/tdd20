@@ -23,7 +23,7 @@ export namespace TDD20
 	template <>                     inline std::string ToString(const std::wstring& t)
 	{
 		std::string s;
-		std::transform(t.begin(), t.end(), std::back_inserter(s), [](wchar_t wc) { return static_cast<char>(wc); }); // lossy: drops high bits
+		std::transform(t.begin(), t.end(), std::back_inserter(s), [](wchar_t wc) { return static_cast<char>(wc); }); // N.B.: lossy - drops high bits
 		return s;
 	}
 	template <> inline std::string ToString(const wchar_t* t) { return ToString(std::wstring(t)); }
