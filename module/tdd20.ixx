@@ -59,17 +59,11 @@ export namespace TDD20
 		static void IsTrue (bool actual, const std::string& message="", std::source_location loc=std::source_location::current()) { AreEqual(true,  actual, message, loc); }
 		template <typename E, typename L> static void ExpectingException(L l, const std::string& message=std::string(), std::source_location loc = std::source_location::current())
 		{
-#ifdef _CPPRTTI
-			auto AddMoreText = [](const std::string& m) { return std::format("; was expecting exception of type '{}'{}", typeid(E).name(), m); };
-#else
-			auto AddMoreText = [](const std::string& m) { return std::string(" (RTTI is turned off otherwise the expected exception type would be displayed here)") + m; };
-#endif
-			std::string m = message.empty() ? "" : std::string(" - ") + message;
-
+			std::string m = std::format("; was expecting exception of type '{}'{}", typeid(E).name(), message.empty() ? "" : std::format(" - {}", message) );
 			try { l(); }
 			catch (const E&) { return; }
-			catch (...) { throw AssertException("exception of wrong type thrown" + AddMoreText(m), loc.line(), loc.file_name()); }
-			throw               AssertException("no exception thrown"            + AddMoreText(m), loc.line(), loc.file_name());
+			catch (...) { throw AssertException("exception of wrong type thrown" + m, loc.line(), loc.file_name()); }
+			throw               AssertException("no exception thrown"            + m, loc.line(), loc.file_name());
 		}
 	};
 
