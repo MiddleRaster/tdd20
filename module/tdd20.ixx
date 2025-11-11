@@ -8,25 +8,20 @@ import std;
 
 export namespace TDD20
 {
-	template<typename T> inline std::string ToString(const T&) { static_assert(false, "test writer must write a specialization for this type"); }
+	template<typename T> inline std::string ToString(const T&) { static_assert(sizeof(T) == 0, "test writer must write a specialization for this type"); }
 	template<typename T> inline std::string ToString(T* t)
 	{	// for generic pointer types, return hex value of address
 		std::ostringstream oss;
 		oss << "0x" << std::uppercase << std::hex << reinterpret_cast<std::uintptr_t>(t);
 		return oss.str();
 	}
-	                                inline std::string ToString(const         bool& t) { return t ? "true" : "false"; } // N.B.: an overload, not a specialization
-	template<std::integral       T> inline std::string ToString(const            T& t) { return std::to_string(t); }
-	template<std::floating_point T> inline std::string ToString(const            T& t) { return std::format("{:.15f}", t); } // N.B.: 15 digits of precision
-	template <>                     inline std::string ToString(const  std::string& t) { return t; }
-	template <>                     inline std::string ToString(const         char* t) { return std::string(t); }
-	template <>                     inline std::string ToString(const std::wstring& t)
-	{
-		std::string s;
-		std::transform(t.begin(), t.end(), std::back_inserter(s), [](wchar_t wc) { return static_cast<char>(wc); }); // N.B.: lossy - drops high bits
-		return s;
-	}
-	template <> inline std::string ToString(const wchar_t* t) { return ToString(std::wstring(t)); }
+	template<std::integral       T> inline std::string ToString(const T& t) { return std::to_string(t); }
+	template<std::floating_point T> inline std::string ToString(const T& t) { return std::format("{:.15f}", t); } // N.B.: 15 digits of precision
+	            inline std::string ToString(const         bool& t) { return t ? "true" : "false"; } // N.B.: an overload, not a specialization
+	template <> inline std::string ToString(const  std::string& t) { return t; }
+	template <> inline std::string ToString(const         char* t) { return std::string(t); }
+	template <> inline std::string ToString(const std::wstring& t) { return std::accumulate(t.cbegin(), t.cend(), std::string(), [](auto s, wchar_t wc) { return s + static_cast<char>(wc); }); } //N.B.: lossy - drops high bits
+	template <> inline std::string ToString(const      wchar_t* t) { return ToString(std::wstring(t)); }
 
 	struct AssertException : public std::exception
 	{
