@@ -59,11 +59,10 @@ export namespace TDD20
 		static void IsTrue (bool actual, const std::string& message="", std::source_location loc=std::source_location::current()) { AreEqual(true,  actual, message, loc); }
 		template <typename E, typename L> static void ExpectingException(L l, const std::string& message=std::string(), std::source_location loc=std::source_location::current())
 		{
-			std::string m = std::format("; was expecting exception of type '{}'{}", typeid(E).name(), message.empty() ? "" : " - " + message);
 			try { l(); }
 			catch (const E&) { return; }
-			catch (...) { throw AssertException("exception of wrong type thrown" + m, loc.line(), loc.file_name()); }
-			throw               AssertException("no exception thrown"            + m, loc.line(), loc.file_name());
+			catch (...) { throw AssertException(std::format("exception of wrong type thrown; was expecting exception of type '{}'{}", typeid(E).name(), message.empty() ? "" : " - " + message), loc.line(), loc.file_name()); }
+			throw               AssertException(std::format(           "no exception thrown; was expecting exception of type '{}'{}", typeid(E).name(), message.empty() ? "" : " - " + message), loc.line(), loc.file_name());
 		}
 	};
 
