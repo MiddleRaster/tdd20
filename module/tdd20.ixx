@@ -8,7 +8,7 @@ import std;
 
 export namespace TDD20
 {
-	template<typename T>			inline std::string ToString(const            T&  ) { static_assert(sizeof(T) == 0, "test writer must write a specialization for this type"); }
+	template<typename T>			inline std::string ToString(const            T&) { static_assert(sizeof(T) == 0, "test writer must write a specialization for this type"); return {}; }
 	template<typename T>			inline std::string ToString(                 T* t) { return std::format("0x{:X}", reinterpret_cast<std::uintptr_t>(t)); }
 	template<std::integral       T> inline std::string ToString(const            T& t) { return std::to_string(t); }
 	template<std::floating_point T> inline std::string ToString(const            T& t) { return std::format("{:.15f}", t); }		// 15 digits of precision
