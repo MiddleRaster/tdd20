@@ -8,10 +8,10 @@ import std;
 
 export namespace TDD20
 {
-	template<typename T>			inline std::string ToString(const   T&  ) { static_assert(sizeof(T) == 0, "test writer must write a specialization for this type"); }
-	template<typename T>			inline std::string ToString(        T* t) { return std::format("0x{:X}", reinterpret_cast<std::uintptr_t>(t)); }
-	template<std::integral       T> inline std::string ToString(const T& t) { return std::to_string(t); }
-	template<std::floating_point T> inline std::string ToString(const T& t) { return std::format("{:.15f}", t); }		// 15 digits of precision
+	template<typename T>			inline std::string ToString(const            T&  ) { static_assert(sizeof(T) == 0, "test writer must write a specialization for this type"); }
+	template<typename T>			inline std::string ToString(                 T* t) { return std::format("0x{:X}", reinterpret_cast<std::uintptr_t>(t)); }
+	template<std::integral       T> inline std::string ToString(const            T& t) { return std::to_string(t); }
+	template<std::floating_point T> inline std::string ToString(const            T& t) { return std::format("{:.15f}", t); }		// 15 digits of precision
 									inline std::string ToString(const         bool& t) { return t ? "true" : "false"; }	// an overload, not a specialization
 	template <>						inline std::string ToString(const  std::string& t) { return t; }
 	template <>						inline std::string ToString(const         char* t) { return std::string(t); }
@@ -42,7 +42,7 @@ export namespace TDD20
 		}
 		template<typename S, typename T> static void AreNotEqual(const S& expected, const T& actual, const std::string& message="", std::source_location loc=std::source_location::current())
 		{
-			std::string Actual = ToString(actual);
+			std::string Actual{ToString(actual)};
 			if (ToString(expected) == Actual)
 				throw AssertException(std::format("Unexpected equality <{}>{}", Actual, message.empty() ? "" : " - " + message), loc.line(), loc.file_name());
 		}
@@ -62,17 +62,14 @@ export namespace TDD20
 		}
 	};
 
-	struct Test
+	class Test
 	{
-		static auto& GetTests()
-		{
-			static std::vector<std::pair<std::string, std::function<void()>>> tests;
-			return tests;
-		}
+		inline static std::vector<std::pair<std::string, std::function<void()>>> tests;
+	public:
 		static std::pair<int, int> RunTests(auto&& matcher, auto&& out)
 		{
 			int passed = 0, failed = 0;
-			for (auto& [name, func] : GetTests()) {
+			for (auto& [name, func] : tests) {
 				if (false == matcher.WantTest(name))
 					continue;
 
@@ -89,6 +86,6 @@ export namespace TDD20
 			out << std::format("\n{} failure(s) out of {} test(s) run\n\n", failed, passed + failed);
 			return {passed, failed};
 		}
-		Test(const std::string& name, std::function<void()> func) { GetTests().push_back(std::pair{name, func}); }
+		Test(const std::string& name, std::function<void()> func) { tests.push_back(std::pair{name, func}); }
 	};
 }
