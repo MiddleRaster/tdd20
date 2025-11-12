@@ -1,4 +1,4 @@
-// Copyright © 2025 MiddleRaster
+// Copyright (c) 2025 MiddleRaster
 // Licensed under the MIT License
 // See LICENSE file in the project root for full license information.
 
@@ -28,7 +28,7 @@ export namespace TDD20
 	{
 		const std::string message, file;
 		const int line;
-		AssertException(const std::string& msg, int line, const std::string& file) : message(msg), line(line), file(file) {}
+		AssertException(const std::string& msg, int line, const std::string& file) : message(msg), file(file), line(line) {}
 		const char* what() const noexcept override { return message.c_str(); }
 	};
 	struct Assert
