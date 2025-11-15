@@ -24,7 +24,7 @@ Running the tests is done by calling the static
 method ```static std::pair<int, int> Test::RunTests(auto&& matcher, auto&& out);```.
 
 There are two customization points:
-1. You can write your own matcher to specify which tests to run; the default matcher runs those tests whose names match any command-line arguments, if any, or else all of them.
+1. You can write your own matcher to specify which tests to run; the default matcher runs those tests whose names match the command-line arguments, if any, or else all of them.
 1. You can customize the output by writing your own ```out``` class (must implement ```void operator<<(const std::string&);```).
 
 ### How to use:
