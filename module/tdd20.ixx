@@ -83,7 +83,6 @@ export namespace TDD20
 				catch (...)                      { out << std::format("{}({}) : warning unit-test: \"{}\" failed with: {}\n",    "?",      1, name, "unknown exception caught"); }
 				++failed;
 			}
-			out << std::format("\n{} failure(s) out of {} test(s) run\n\n", failed, passed + failed);
 			return {passed, failed};
 		}
 		Test(const std::string& name, std::function<void()> func) { tests.push_back(std::pair{name, func}); }
