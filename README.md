@@ -51,11 +51,6 @@ The supplied ```main.cpp``` has the following command-line options:
 | ```ExpectingException``` | expects a callable to throw an exception of a specified type |
 </div>
 
-### Building the C++ module and .exe:
-The solution has two projects:
-1. **tdd20**: builds the C++ module interface file.
-1. **exe**: builds the demo executable that imports the module.
-
 ### Running the tests:
 After building the .exe project, you can add the executable as a post-build step, if you so desire.
 The output will be captured by Visual Studio and shown in the "Error List" and "Output" windows, as ***warnings***.
