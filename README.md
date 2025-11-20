@@ -32,7 +32,7 @@ There are two customization points:
 
 See examples in the **tests** folder for how to write tests.
 The supplied ```main.cpp``` has the following command-line options:
- - ```-dump``` or ```/dump```: dumps all test names, then exits.
+ - ```-dump```, ```--dump```, ```-d``` or ```/dump```: dumps all test names, then exits.
  - the name of one or more tests:  e.g., ```tdd20.exe "SomeMoreTests::TestSeven" "an IsFalse test"```.
  - no arguments: runs all tests.
  - The output is exactly in the format Visual Studio expects, so if you run the .exe as a post-build step in Visual Studio, the test results will appear in the "Error List" and "Output" windows.
