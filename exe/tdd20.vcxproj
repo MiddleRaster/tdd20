@@ -30,7 +30,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v170</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -163,7 +163,7 @@
     <ClCompile Include="..\tests\SomeFailingTests.cpp" />
     <ClCompile Include="..\tests\ToStringTests.cpp" />
   </ItemGroup>
-<!--  <ItemGroup>
+  <!--  <ItemGroup>
     <ProjectReference Include="..\tdd20.vcxproj">
       <Project>{ed49e964-ea48-414f-a4b0-0cbe68b12f37}</Project>
     </ProjectReference>
