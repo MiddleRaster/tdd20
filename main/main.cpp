@@ -3,7 +3,7 @@ import tdd20;
 
 int main(int argc, char* argv[])
 {
-	if ((argc > 1) && (argv[1] == std::string("-dump") || argv[1] == std::string("/dump")))
+	if ((argc > 1) && (argv[1] == std::string("-dump") || argv[1] == std::string("-d") || argv[1] == std::string("--dump") || argv[1] == std::string("/dump")))
 	{
 		struct Dumper { bool WantTest  (const std::string& name) const { std::cout << name << "\n"; return false; } };
 		struct Noop   { void operator<<(const std::string&) {} };
