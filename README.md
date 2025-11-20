@@ -15,7 +15,7 @@ A macro-free, module-only TDD/unit testing harness for C++20 or later.
 1. **main** contains the main() entry point.
 1. **module** contains the single module interface file for the test harness.
 1. **tests** contains some sample tests, a few of which report errors.
-1. **Tdd20Exe** contains the project file for building the test executable.
+1. **exe** contains the project file for building the test executable.
 
 ### How it works:
 A test is an instance of the ```Test``` struct that holds onto the name and a ````std::function<void()>```` representing the test body;
@@ -54,7 +54,7 @@ The supplied ```main.cpp``` has the following command-line options:
 ### Building the C++ module and .exe:
 The solution has two projects:
 1. **tdd20**: builds the C++ module interface file.
-1. **Tdd20Exe**: builds the demo executable that imports the module.
+1. **exe**: builds the demo executable that imports the module.
 
 ### Running the tests:
 After building the .exe project, you can add the executable as a post-build step, if you so desire.
