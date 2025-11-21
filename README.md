@@ -26,7 +26,7 @@ method ```static std::pair<int, int> Test::RunTests(auto&& matcher, auto&& out);
 
 There are two customization points:
 1. You can write your own matcher to specify which tests to run; the default matcher runs those tests whose names match the command-line arguments, if any, or else all of them.
-1. You can customize the output by writing your own ```out``` class (must implement ```void operator<<(const std::string&);```).
+1. You can customize the output by writing your own ```out``` class (must implement ```operator<<(const std::string&);``` e.g. std::ostream).
 
 ### How to use:
 
