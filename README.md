@@ -56,6 +56,11 @@ After building the .exe project, you can add the executable as a post-build step
 The output will be captured by Visual Studio and shown in the "Error List" and "Output" windows, as ***warnings***.
 Double-clicking on one will take you to the corresponding line in the source code.
 
+### Visual Studio Test Explorer integration
+If you *really* want to run your tests inside Visual Studio's Test Explorer, see my [Test Adapter](https://github.com/MiddleRaster/Tdd20.TestAdapter).
+I don't really recommend doing so however, because Visual Studio's Test Explorer is quite slow, not really suitable for doing TDD.
+The previous section describes the recommended way to run the tests.
+
 ### Future work:
 Eventually, I'll write a GUI version and
 a console version that outputs in color (red/green) for better readability.
