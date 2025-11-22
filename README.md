@@ -2,6 +2,25 @@
 
 A macro-free, module-only TDD/unit testing harness for C++20 or later.
 
+### Sample uage:
+
+```
+import tdd20;
+using namespace TDD20;
+
+Test someFailingTests[] = 
+{
+	{"generic pointer test",                     []{ struct X {} a,b; Assert::AreEqual(&a, &b); } }, // compares hex addresses
+	{"just failing right off",                   []{ Assert::Fail       ("Yep, failed"); } },
+	{"an Assert::AreNotEqual test",              []{ Assert::AreNotEqual("hello", "hello"); }},
+	{"an IsWithin test using 15 decimal places", []{ Assert::AreWithin  (std::numbers::pi, 3.14, 0.0001, "not close enough"); } },
+	{"an IsFalse test",                          []{ Assert::IsFalse    (true,  "this should be false"); } },
+	{"an IsTrue test",                           []{ Assert::IsTrue     (false, "this should be true" ); } },
+	{"asserts when no exception is thrown",      []{ Assert::ExpectingException<std::exception>([]() { /* no throw */ } },
+};
+
+```
+
 ### Design goals:
 1. Module-only
 1. No macros
