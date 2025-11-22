@@ -4,7 +4,7 @@ A macro-free, module-only TDD/unit testing harness for C++20 or later.
 
 ### Sample uage:
 
-```
+```cpp
 import tdd20;
 using namespace TDD20;
 
