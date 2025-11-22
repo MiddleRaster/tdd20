@@ -1,0 +1,13 @@
+<Solution Id="{B26788C8-0028-4074-AE5F-579AC311E7EA}">
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+
+  <Folder Name="/Solution Items/">
+    <File Path="LICENSE.txt" />
+    <File Path="README.md" />
+  </Folder>
+
+  <Project Path="exe\Tdd20.vcxproj" Id="{18DBC1F5-909D-466C-9EB5-4CB9D54E40D0}" />
+</Solution>
