@@ -4,7 +4,7 @@
     <Platform Name="x86" />
   </Configurations>
 
-  <Folder Name="/Solution Items/">
+  <Folder Name="/about/">
     <File Path="LICENSE.txt" />
     <File Path="README.md" />
   </Folder>
