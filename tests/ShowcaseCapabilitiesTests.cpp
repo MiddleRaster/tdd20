@@ -1,8 +1,48 @@
 import tdd20;
 using namespace TDD20;
 
+#include <fstream>
+#include <filesystem>
+
+//#include <scope> // doesn't exist yet, so
+namespace std      // roll yer own minimal scope_exit
+{
+	template<class EF> class scope_exit
+	{
+		EF func;
+	public:
+		explicit scope_exit(EF&& f) noexcept(std::is_nothrow_move_constructible_v<EF>) : func(std::forward<EF>(f)) {}
+		~scope_exit() noexcept { try { func(); } catch (...) {} }
+	};
+}
+// demo per test initialize and teardown by creating/deleting a tempfile 
+std::filebuf MakeTempFile()
+{
+	std::filebuf fb;
+	if (!fb.open(std::filesystem::current_path() / "tempfile.txt", std::ios::in | std::ios::out | std::ios::trunc))
+		throw std::runtime_error("failed to open 'tempfile.txt'");
+	return fb;
+}
+void DeleteTempFile(std::filebuf& fb)
+{
+	fb.close();
+	std::filesystem::remove(std::filesystem::current_path() / "tempfile.txt");
+}
+Test demoingPerTestInitializationAndCleanup[] =
+{
+	{"YetMoreTests::Test", [] {
+
+		auto tempfile = MakeTempFile();
+		std::scope_exit cleanup{ [&tempfile]() { DeleteTempFile(tempfile); } };
+
+		// do work, assert, etc.
+		tempfile.sputn("hello\n", 6);
+	}},
+};
+
+
 static void* p = nullptr;
-Test demoingInitializationAndCleanup[] =
+Test demoingSuiteInitializationAndCleanup[] =
 {
 	{"SomeMoreTests::Initialize",[]{ p = ::operator new(7); }},
 	{"SomeMoreTests::TestOne",   []{ }},
