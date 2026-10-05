@@ -16,9 +16,8 @@ Test someFailingTests[] =
   {"doubles to 15 places",    []{ Assert::AreWithin(std::numbers::pi, 3.14, 0.0001, "not close enough"); } },
   {"an IsFalse test",         []{ Assert::IsFalse(true,  "this should be false"); } },
   {"an IsTrue test",          []{ Assert::IsTrue (false, "this should be true" ); } },
-  {"asserts if no exception", []{ Assert::ExpectingException<std::exception>([]() { /* no throw */ } },
+  {"asserts if no exception", []{ Assert::ExpectingException<std::exception>([]() { /* no throw */ }); } },
 };
-
 ```
 
 ### Design goals:
