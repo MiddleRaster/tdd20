@@ -2,7 +2,7 @@
 
 A macro-free, module-only TDD/unit testing harness for C++20 or later.
 
-### Sample uage:
+### Sample usage:
 
 ```cpp
 import tdd20;
