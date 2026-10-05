@@ -66,7 +66,7 @@ The supplied ```main.cpp``` has the following command-line options:
 | ```IsTrue```             | compares a value to true |
 | ```IsFalse```            | compares a value to false |
 | ```Fail```               | fails with a message |
-| ```IsWithin```           | compares two doubles for approximate equality within a tolerance |
+| ```AreWithin```          | compares two doubles for approximate equality within a tolerance |
 | ```ExpectingException``` | expects a callable to throw an exception of a specified type |
 </div>
 
