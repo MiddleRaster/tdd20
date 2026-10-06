@@ -24,7 +24,7 @@ Test AssertTests[] =
 	{"AssertTests: AreNotEqual does throw when equal", []() { Catcher([]() { Assert::AreNotEqual(42, 42, "Values are equal"); }, "Assert::AreNotEqual", "Unexpected equality <42> - Values are equal"); } },
 
 	{"AssertTests: AreWithin doesn't throw when within tolerance",  []() {                Assert::AreWithin(4.2, 4.3, 0.15); } },
-	{"AssertTests: AreWithin does throw when not within tolerance", []() { Catcher([]() { Assert::AreWithin(4.2, 4.3, 0.05, "Values are out of tolerance"); }, "Assert::AreWithin", "Expected <4.200000000000000> to be within <0.050000000000000> of <4.300000000000000> - Values are out of tolerance"); } },
+	{"AssertTests: AreWithin does throw when not within tolerance", []() { Catcher([]() { Assert::AreWithin(4.2, 4.3, 0.05, "Values are out of tolerance"); }, "Assert::AreWithin", "Expected <4.2> to be within <0.05> of <4.3> - Values are out of tolerance"); } },
 
 	{"AssertTests: IsFalse doesn't throw when false", []() {            Assert::IsFalse(false); } },
 	{"AssertTests: IsFalse does throw when true", []() { Catcher([]() { Assert::IsFalse(true, "Value is true"); }, "Assert::IsFalse", "Expected <false> Actual <true> - Value is true"); } },

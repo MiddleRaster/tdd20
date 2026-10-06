@@ -11,7 +11,7 @@ export namespace TDD20
 	template<typename T>			inline std::string ToString(const            T&) { static_assert(sizeof(T) == 0, "test writer must write a specialization for this type"); return {}; }
 	template<typename T>			inline std::string ToString(                 T* t) { return std::format("0x{:X}", reinterpret_cast<std::uintptr_t>(t)); } // generic pointer converted to hex string
 	template<std::integral       T> inline std::string ToString(const            T& t) { return std::to_string(t); }
-	template<std::floating_point T> inline std::string ToString(const            T& t) { return std::format("{:.15f}", t); } // 15 digits of precision
+	template<std::floating_point T> inline std::string ToString(const            T& t) { return std::format("{}", std::common_type_t<T, double>(t)); } // shortest round-trip as a double (floats widened first), so differing values never print alike
 									inline std::string ToString(const         bool& t) { return t ? "true" : "false"; }	// an overload, not a specialization
 	template <>						inline std::string ToString(const  std::string& t) { return t; }
 	template <>						inline std::string ToString(const         char* t) { return std::string(t); }
