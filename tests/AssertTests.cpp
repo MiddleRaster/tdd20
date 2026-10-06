@@ -24,9 +24,9 @@ Test AssertTests[] =
 	{"AssertTests: AreNotEqual does    throw when   equal", []() { Catcher([]() { Assert::AreNotEqual(42, 42, "Values are equal"); }, "Assert::AreNotEqual", "Unexpected equality <42> - Values are equal"); } },
 
 	{"AssertTests: AreWithin doesn't throw when within tolerance" , []() {                Assert::AreWithin(4.2, 4.3, 0.15); } },
-	{"AssertTests: AreWithin does throw when not within tolerance", []() { Catcher([]() { Assert::AreWithin(4.2, 4.3, 0.05, "Values are out of tolerance"); }, "Assert::AreWithin", "Expected <4.2> to be within <0.05> of <4.3> - Values are out of tolerance"); } },
-	{"AssertTests: NaN against 1.0"                               , []() { Catcher([]() { Assert::AreWithin(std::numeric_limits<double>::quiet_NaN(), 1.0,                                      0.1); }, "Assert::AreWithin", "Expected <nan> to be within <0.1> of <1>"); } },
-    {"AssertTests: 1.0 against NaN"                               , []() { Catcher([]() { Assert::AreWithin(1.0                                     , std::numeric_limits<double>::quiet_NaN(), 0.1); }, "Assert::AreWithin", "Expected <1> to be within <0.1> of <nan>"); } },
+	{"AssertTests: AreWithin does throw when not within tolerance", []() { Catcher([]() { Assert::AreWithin(4.2, 4.3, 0.05, "Values are out of tolerance"); }, "Assert::AreWithin", "Expected <4.3> to be within <0.05> of <4.2> - Values are out of tolerance"); } },
+	{"AssertTests: NaN against 1.0"                               , []() { Catcher([]() { Assert::AreWithin(std::numeric_limits<double>::quiet_NaN(), 1.0,                                      0.1); }, "Assert::AreWithin", "Expected <1> to be within <0.1> of <nan>"); } },
+    {"AssertTests: 1.0 against NaN"                               , []() { Catcher([]() { Assert::AreWithin(1.0                                     , std::numeric_limits<double>::quiet_NaN(), 0.1); }, "Assert::AreWithin", "Expected <nan> to be within <0.1> of <1>"); } },
 	{"AssertTests: NaN against NaN"                               , []() { Catcher([]() { Assert::AreWithin(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(), 0.1); }, "Assert::AreWithin", "Expected <nan> to be within <0.1> of <nan>"); } },
 
 	{"AssertTests: IsFalse doesn't throw when false", []() {            Assert::IsFalse(false); } },
