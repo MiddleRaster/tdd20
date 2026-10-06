@@ -3,7 +3,6 @@
 // See LICENSE file in the project root for full license information.
 
 export module tdd20;
-
 import std;
 
 export namespace TDD20
@@ -15,11 +14,12 @@ export namespace TDD20
 									inline std::string ToString(const         bool& t) { return t ? "true" : "false"; }	// an overload, not a specialization
 	template <>						inline std::string ToString(const  std::string& t) { return t; }
 	template <>						inline std::string ToString(const         char* t) { return std::string(t); }
+	template <>						inline std::string ToString(              char* t) { return std::string(t); }
 	template <>						inline std::string ToString(const std::wstring& t)
 	{
 		std::string s;
 		for (wchar_t wc : t)
-			s += static_cast<char>(wc); // lossy:  drops high bits
+			s += (wc >= 0x20 && wc <= 0x7E) ? std::string(1, static_cast<char>(wc)) : std::format("\\u{:04X}", static_cast<unsigned>(wc));
 		return s;
 	}
 	template <>						inline std::string ToString(const      wchar_t* t) { return ToString(std::wstring(t)); }

@@ -1,4 +1,5 @@
-import tdd20;
+﻿import tdd20;
+import std;
 using namespace TDD20;
 
 Test ToStringTests[] =
@@ -51,8 +52,9 @@ Test ToStringTests[] =
 	{"ToString: max      double", []() { Assert::AreEqual("1.7976931348623157e+308", ToString(std::numeric_limits<     double>::max())); } },
 	{"ToString: max long double", []() { Assert::AreEqual("1.7976931348623157e+308", ToString(std::numeric_limits<long double>::max())); } },
 	// do every string type:
-	{"ToString:  std::string", []() { Assert::AreEqual("Hi, there", ToString( std::string ("Hi, there"))); }},
-	{"ToString:       char *", []() { Assert::AreEqual("Hi, there", ToString(              "Hi, there" )); }},
-	{"ToString: std::wstring", []() { Assert::AreEqual("Hi, there", ToString(std::wstring(L"Hi, there"))); }},
-	{"ToString:    wchar_t *", []() { Assert::AreEqual("Hi, there", ToString(             L"Hi, there" )); }},
+	{"ToString:  std::string", []() { Assert::AreEqual("Hi, there",						   ToString( std::string ("Hi, there"))); }},
+	{"ToString:       char *", []() { Assert::AreEqual("Hi, there",						   ToString(              "Hi, there" )); }},
+	{"ToString: std::wstring", []() { Assert::AreEqual("Hi, there",						   ToString(std::wstring(L"Hi, there"))); }},
+	{"ToString:    wchar_t *", []() { Assert::AreEqual("Hi, there",						   ToString(             L"Hi, there" )); }},
+  	{"ToString: mixed wchar*", []() { Assert::AreEqual("Temperature \\u03A9 = 25\\u00B0C", ToString(   L"Temperature Ω = 25°C")); }},
 };
