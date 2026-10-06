@@ -2,7 +2,7 @@
 
 A macro-free, module-only TDD/unit testing harness for C++20 or later.
 
-### Sample uage:
+### Sample usage:
 
 ```cpp
 import tdd20;
@@ -16,9 +16,8 @@ Test someFailingTests[] =
   {"doubles to 15 places",    []{ Assert::AreWithin(std::numbers::pi, 3.14, 0.0001, "not close enough"); } },
   {"an IsFalse test",         []{ Assert::IsFalse(true,  "this should be false"); } },
   {"an IsTrue test",          []{ Assert::IsTrue (false, "this should be true" ); } },
-  {"asserts if no exception", []{ Assert::ExpectingException<std::exception>([]() { /* no throw */ } },
+  {"asserts if no exception", []{ Assert::ExpectingException<std::exception>([]() { /* no throw */ }); } },
 };
-
 ```
 
 ### Design goals:
@@ -37,7 +36,7 @@ Test someFailingTests[] =
 1. **exe** contains the project file for building the test executable.
 
 ### How it works:
-A test is an instance of the ```Test``` struct that holds onto the name and a ````std::function<void()>```` representing the test body;
+A test is an instance of the ```Test``` struct that holds onto the name and a ```std::function<void()>```` representing the test body;
 you'll probably want to use a lambda.
 Tests are typically held in one or more arrays and are auto-registered.
 Running the tests is done by calling the static
@@ -66,7 +65,7 @@ The supplied ```main.cpp``` has the following command-line options:
 | ```IsTrue```             | compares a value to true |
 | ```IsFalse```            | compares a value to false |
 | ```Fail```               | fails with a message |
-| ```IsWithin```           | compares two doubles for approximate equality within a tolerance |
+| ```AreWithin```          | compares two doubles for approximate equality within a tolerance |
 | ```ExpectingException``` | expects a callable to throw an exception of a specified type |
 </div>
 
