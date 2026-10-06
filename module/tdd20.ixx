@@ -49,7 +49,7 @@ export namespace TDD20
 		static void AreWithin(double expected, double actual, double tolerance, const std::string& message="", std::source_location loc=std::source_location::current())
 		{
 			if (!(std::fabs(expected - actual) <= tolerance)) // must be done this way so that NaN works
-				throw AssertException(std::format("Expected <{}> to be within <{}> of <{}>{}", ToString(expected), ToString(tolerance), ToString(actual), message.empty() ? "" : " - " + message), loc.line(), loc.file_name());
+				throw AssertException(std::format("Expected <{}> to be within <{}> of <{}>{}", ToString(actual), ToString(tolerance), ToString(expected), message.empty() ? "" : " - " + message), loc.line(), loc.file_name());
 		}
 		static void IsFalse(bool actual, const std::string& message="", std::source_location loc=std::source_location::current()) { AreEqual(false, actual, message, loc); }
 		static void IsTrue (bool actual, const std::string& message="", std::source_location loc=std::source_location::current()) { AreEqual(true,  actual, message, loc); }
