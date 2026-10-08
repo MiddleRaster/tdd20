@@ -46,7 +46,7 @@ export namespace TDD20
 			if (ToString(expected) == Actual)
 				throw AssertException(std::format("Unexpected equality <{}>{}", Actual, message.empty() ? "" : " - " + message), loc.line(), loc.file_name());
 		}
-		static void AreWithin(double expected, double actual, double tolerance, const std::string& message="", std::source_location loc=std::source_location::current())
+		template<std::floating_point T> static void AreWithin(T expected, T actual, T tolerance, const std::string& message="", std::source_location loc=std::source_location::current())
 		{
 			if (!(std::fabs(expected - actual) <= tolerance)) // must be done this way so that NaN works
 				throw AssertException(std::format("Expected <{}> to be within <{}> of <{}>{}", ToString(actual), ToString(tolerance), ToString(expected), message.empty() ? "" : " - " + message), loc.line(), loc.file_name());
@@ -85,6 +85,6 @@ export namespace TDD20
 			}
 			return {passed, failed};
 		}
-		Test(const std::string& name, std::function<void()> func) { tests.push_back(std::pair{name, func}); }
+		Test(const std::string& name, std::function<void()> func) { tests.emplace_back(name, std::move(func)); }
 	};
 }
