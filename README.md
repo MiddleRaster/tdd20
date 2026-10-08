@@ -36,7 +36,7 @@ Test someFailingTests[] =
 1. **exe** contains the project file for building the test executable.
 
 ### How it works:
-A test is an instance of the ```Test``` struct that holds onto the name and a ```std::function<void()>```` representing the test body;
+A test is an instance of the ```Test``` struct that holds onto the name and a ```std::function<void()>``` representing the test body;
 you'll probably want to use a lambda.
 Tests are typically held in one or more arrays and are auto-registered.
 Running the tests is done by calling the static
