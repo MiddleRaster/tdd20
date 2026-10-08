@@ -25,4 +25,10 @@ Test demoingCustomToStringForAUserDefinedType[] =
     {"show how to write a helper for your own type, an enum Color, in this case", [] { Assert::AreEqual(MyNamespace::Red, "Red"); }},
 };
 
+
+// can't prevent clients from writing code like this; handled by iterating over a snapshot of the test vector
+void AddTests() { for (int i=0; i<1000; ++i) { Test test("another test", AddTests); } }
+Test DontDoThis("Don't do this", AddTests);
+
+
 Test aTestNeedNotBePartOfArray("a test with two different types", []() { Assert::AreEqual(42, "42"); });

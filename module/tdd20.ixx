@@ -19,7 +19,7 @@ export namespace TDD20
 	{
 		std::string s;
 		for (wchar_t wc : t)
-			s += (wc >= 0x20 && wc <= 0x7E) ? std::string(1, static_cast<char>(wc)) : std::format("\\u{:04X}", static_cast<unsigned>(wc));
+			s += wc <= 0x7E ? std::string(1, static_cast<char>(wc)) : std::format("\\u{:04X}", static_cast<unsigned>(wc));
 		return s;
 	}
 	template <>						inline std::string ToString(const      wchar_t* t) { return ToString(std::wstring(t)); }
@@ -69,7 +69,7 @@ export namespace TDD20
 		static std::pair<int, int> RunTests(auto&& matcher, auto&& out)
 		{
 			int passed = 0, failed = 0;
-			for (auto& [name, func] : tests) {
+			for (auto& [name, func] : std::vector(std::move(tests))) { // move tests into a private snapshot so registration of additional tests cannot invalidate this iteration
 				if (false == matcher.WantTest(name))
 					continue;
 
