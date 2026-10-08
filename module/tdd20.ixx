@@ -15,8 +15,7 @@ export namespace TDD20
 	template <>						inline std::string ToString(const  std::string& t) { return t; }
 	template <>						inline std::string ToString(const         char* t) { return std::string(t); }
 	template <>						inline std::string ToString(              char* t) { return std::string(t); }
-	template <>						inline std::string ToString(const std::wstring& t)
-	{
+	template <>						inline std::string ToString(const std::wstring& t) {
 		std::string s;
 		for (wchar_t wc : t)
 			s += wc <= 0x7E ? std::string(1, static_cast<char>(wc)) : std::format("\\u{:04X}", static_cast<unsigned>(wc));
