@@ -13,7 +13,7 @@ Test someFailingTests[] =
   {"generic pointer test",    []{ class X{} a,b; Assert::AreEqual(&a, &b);}},// compares hex addresses
   {"just failing right off",  []{ Assert::Fail("Yep, failed"); } },
   {"an AreNotEqual test",     []{ Assert::AreNotEqual("hello", "hello"); }},
-  {"doubles to 15 places",    []{ Assert::AreWithin(std::numbers::pi, 3.14, 0.0001, "not close enough"); } },
+  {"doubles within tolerance",[]{ Assert::AreWithin(std::numbers::pi, 3.14, 0.0001, "not close enough"); } },
   {"an IsFalse test",         []{ Assert::IsFalse(true,  "this should be false"); } },
   {"an IsTrue test",          []{ Assert::IsTrue (false, "this should be true" ); } },
   {"asserts if no exception", []{ Assert::ExpectingException<std::exception>([]() { /* no throw */ }); } },
