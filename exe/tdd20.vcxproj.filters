@@ -54,5 +54,8 @@
     <ClCompile Include="..\Client Extensions\CustomToString.cpp">
       <Filter>Client Extensions</Filter>
     </ClCompile>
+    <ClCompile Include="..\Client Extensions\RetryingTests.cpp">
+      <Filter>Client Extensions</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
