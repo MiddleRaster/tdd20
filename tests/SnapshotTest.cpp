@@ -11,4 +11,4 @@ void AddTests()
 		Test test("another test", AddTests);
 	}
 }
-Test DontDoThis("Don't add new tests during a test run", AddTests);
+Test DontDoThis("Adding new tests during a test run does not work", AddTests);

@@ -4,14 +4,14 @@
 import std;
 import tdd20;
 
-template<class Matcher, class Out> class LeakDetector
+template<class Out, class Matcher> class LeakDetector
 {
+    const std::string dummyLastTestName = std::format("LeakDetector's dummy last test - {}", std::chrono::system_clock::now());
     const Matcher matcher;
     Out& out;
+
     std::string testName;
     _CrtMemState start;
-    TDD20::Test lastTest{"LeakDetector's dummy last test", []() {}};
-
     void OutputLeaks()
     {
         if (!testName.empty()) {
@@ -30,12 +30,16 @@ template<class Matcher, class Out> class LeakDetector
         }
     }
 public:
-    template<class... Args> LeakDetector(Out& out, Args&&... args) : matcher(std::forward<Args>(args)...), out(out) {}
-
+    template<class... Args> LeakDetector(Out& out, Args&&... args) : matcher(std::forward<Args>(args)...), out(out)
+    {
+        TDD20::Test lastTest{dummyLastTestName, [](){}};
+    }
     bool WantTest(const std::string& name)
     {
         OutputLeaks();
         if (!matcher.WantTest(name))
+            return false;
+        if (name == dummyLastTestName)
             return false;
 
         testName = name;
@@ -44,7 +48,7 @@ public:
     }
 };
 
-TDD20::Test aLeakingTest("a leaking test", []() { new char[5000]; });
+TDD20::Test aLeakingTest("a leaking test", []() { new char[42]; });
 
 int main(int argc, char* argv[])
 {
@@ -63,7 +67,7 @@ int main(int argc, char* argv[])
         CmdLineMatcher(int argc, char* argv[]) : args(argv + 1, argv + argc) {}
         bool WantTest(const std::string& name) const { return args.size() == 0 ? true : args.cend() != std::find(args.cbegin(), args.cend(), name); }
     };
-    LeakDetector<CmdLineMatcher, decltype(std::cout)> leakDetector{std::cout, argc, argv};
+    LeakDetector<decltype(std::cout), CmdLineMatcher> leakDetector{std::cout, argc, argv};
     auto [passed, failed] = TDD20::Test::RunTests(leakDetector, std::cout);
     std::cout << std::format("\n{} failure(s) out of {} test(s) run\n\n", failed, passed + failed);
     return 0;
