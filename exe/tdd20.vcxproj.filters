@@ -48,5 +48,11 @@
     <ClCompile Include="..\Client Extensions\SetupAndTeardownTests.cpp">
       <Filter>Client Extensions</Filter>
     </ClCompile>
+    <ClCompile Include="..\tests\SnapshotTest.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Client Extensions\CustomToString.cpp">
+      <Filter>Client Extensions</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
