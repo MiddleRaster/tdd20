@@ -34,7 +34,7 @@ Test someFailingTests[] =
 2. **module** contains the single module interface file for the test harness.
 3. **tests** contains some sample tests, a few of which report errors.
 4. **exe** contains the project file for building the test executable.
-5. **Client Extensions** contains demos of how to do parameterized tests, test fixtures, leak detections, etc.
+5. **Client Extensions** contains demos of how to do parameterized tests, test fixtures, leak detection, etc.
 
 ### How it works:
 A test is an instance of the ```Test``` struct that holds onto the name and a ```std::function<void()>``` representing the test body;
