@@ -57,4 +57,7 @@ Test ToStringTests[] =
 	{"ToString: std::wstring", []() { Assert::AreEqual("Hi, there",						   ToString(std::wstring(L"Hi, there"))); }},
 	{"ToString:    wchar_t *", []() { Assert::AreEqual("Hi, there",						   ToString(             L"Hi, there" )); }},
   	{"ToString: mixed wchar*", []() { Assert::AreEqual("Temperature \\u03A9 = 25\\u00B0C", ToString(   L"Temperature Ω = 25°C")); }},
+
+	{"ToString:   equal arrays of char", []() { Assert::   AreEqual("hi", "hi"); }},
+	{"ToString: unequal arrays of char", []() { Assert::AreNotEqual("hi", "ho"); }},
 };

@@ -163,9 +163,8 @@
     <ClCompile Include="..\Client Extensions\ParameterizedTests.cpp" />
     <ClCompile Include="..\Client Extensions\SetupAndTeardownTests.cpp" />
     <ClCompile Include="..\tests\AssertTests.cpp" />
-    <ClCompile Include="..\tests\ShowcaseCapabilitiesTests.cpp" />
     <ClCompile Include="..\tests\SnapshotTest.cpp" />
-    <ClCompile Include="..\tests\SomeFailingTests.cpp" />
+    <ClCompile Include="..\tests\FailingTestsToDemoVSIntegration.cpp" />
     <ClCompile Include="..\tests\ToStringTests.cpp" />
   </ItemGroup>
   <!--  <ItemGroup>

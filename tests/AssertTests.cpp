@@ -18,9 +18,9 @@ Test AssertTests[] =
 	{"AssertTests: Fail", [](){ Catcher([]() { Assert::Fail("This is a failure message"); }, "Assert::Fail", "This is a failure message"); } },
 
 	{"AssertTests: AreEqual doesn't throw when equal", []() {               Assert::AreEqual(42, 42); } },
-	{"AssertTests: AreEqual does  throw when unequal", []() { Catcher([]() { Assert::AreEqual(42, 43, "Values are not equal"); }, "Assert::AreEqual", "Expected <42> Actual <43> - Values are not equal"); } },
+	{"AssertTests: AreEqual does  throw when unequal", []() { Catcher([]() { Assert::AreEqual(42, "43", "Values are not equal"); }, "Assert::AreEqual", "Expected <42> Actual <43> - Values are not equal"); } },
 
-	{"AssertTests: AreNotEqual doesn't throw when unequal", []() {           Assert::AreNotEqual(42, 43); } },
+	{"AssertTests: AreNotEqual doesn't throw when unequal", []() {                Assert::AreNotEqual(42, 43); } },
 	{"AssertTests: AreNotEqual does    throw when   equal", []() { Catcher([]() { Assert::AreNotEqual(42, 42, "Values are equal"); }, "Assert::AreNotEqual", "Unexpected equality <42> - Values are equal"); } },
 
 	{"AssertTests: AreWithin doesn't throw when within tolerance" , []() {                Assert::AreWithin(4.2, 4.3, 0.15); } },

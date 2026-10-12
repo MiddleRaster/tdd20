@@ -22,5 +22,7 @@ namespace TDD20
 }
 Test demoingCustomToStringForAUserDefinedType[] =
 {
-    {"show how to write a helper for your own type, an enum Color, in this case", [] { Assert::AreEqual(MyNamespace::Red, "Red"); }},
+    {"show how to write a helper for your own type, an enum Color, in this case", [] { Assert::AreEqual   (MyNamespace::Red, "Red"); }},
+    {"enum mismatch",                                                             [] { Assert::AreNotEqual(MyNamespace::Red, "Blue"); }},
+    {"enum mismatch 2",                                                           [] { Assert::AreNotEqual(MyNamespace::Red, MyNamespace::Green); }},
 };

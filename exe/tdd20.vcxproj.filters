@@ -27,10 +27,7 @@
     <ClCompile Include="..\tests\AssertTests.cpp">
       <Filter>tests</Filter>
     </ClCompile>
-    <ClCompile Include="..\tests\ShowcaseCapabilitiesTests.cpp">
-      <Filter>tests</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tests\SomeFailingTests.cpp">
+    <ClCompile Include="..\tests\FailingTestsToDemoVSIntegration.cpp">
       <Filter>tests</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\ToStringTests.cpp">
