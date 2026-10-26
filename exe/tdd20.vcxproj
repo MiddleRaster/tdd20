@@ -156,6 +156,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Client Extensions\BddTests.cpp" />
     <ClCompile Include="..\Client Extensions\CustomToString.cpp" />
     <ClCompile Include="..\Client Extensions\RetryingTests.cpp" />
     <ClCompile Include="..\module\tdd20.ixx" />
