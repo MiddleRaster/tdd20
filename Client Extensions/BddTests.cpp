@@ -24,71 +24,88 @@ public:
 };
 
 
-// how to write BDD tests
+// a simple BDD test harness
 
-template <typename GivenTuple, typename WhenTuple, typename ThenTuple> struct BDDTest
+
+// step tags: each wraps one lambda and knows how to run itself, then hand the possibly accumulated arguments onward
+template <typename Lambda> struct GivenStep
+{
+	Lambda body;
+	template <typename Args, typename Next> void Run(const Args& args, const Next& next) const
+	{
+		if constexpr (std::is_void_v<std::invoke_result_t<const Lambda&>>) {
+			body();
+			next(args);
+		} else {
+			auto&& value = body();	// prvalue initializes the object in place: no move, no copy
+			next(std::tuple_cat(args, std::tuple<std::remove_reference_t<decltype(value)>&>{value}));
+		}
+	}
+};
+template <typename Lambda> struct WhenStep
+{
+	Lambda body;
+	template <typename Args, typename Next> void Run(const Args& args, const Next& next) const
+	{
+		std::apply(body, args);
+		next(args);
+	}
+};
+template <typename Lambda> struct ThenStep
+{
+	Lambda body;
+	template <typename Args, typename Next> void Run(const Args& args, const Next& next) const
+	{
+		std::apply([&](auto&... values) { body(std::as_const(values)...); }, args);
+		next(args);
+	}
+};
+template <std::size_t Index=0, typename StepTuple, typename Args=std::tuple<>> void RecursivelyRunSteps(const StepTuple& steps, const Args& args={})
+{	// runs the steps in declaration order; args holds references to the values of the Givens run so far
+	if constexpr (Index < std::tuple_size_v<StepTuple>)
+		std::get<Index>(steps).Run(args, [&](const auto& nextArgs) { RecursivelyRunSteps<Index+1>(steps, nextArgs); });
+}
+
+template <typename StepTuple> struct BDDTest
 {
 	std::string name;
-	GivenTuple givens;
-	 WhenTuple whens;
-	 ThenTuple thens;
+	StepTuple   steps;
 
-	template <typename NewGiven> auto Given(const std::string&, NewGiven newGiven) const { return Given(newGiven); }
-	template <typename NewGiven> auto Given(NewGiven newGiven) const
+	template <typename Lambda> auto Given(const std::string&, Lambda lambda) const { return Given (          std::move(lambda) ); }
+	template <typename Lambda> auto Given(                    Lambda lambda) const { return Append(GivenStep{std::move(lambda)}); }
+	template <typename Lambda> auto When (const std::string&, Lambda lambda) const { return When  (          std::move(lambda) ); }
+	template <typename Lambda> auto When (                    Lambda lambda) const { return Append(WhenStep {std::move(lambda)}); }
+	template <typename Lambda> auto Then (const std::string&, Lambda lambda) const { return Then  (          std::move(lambda) ); }
+	template <typename Lambda> auto Then (                    Lambda lambda) const { return Append(ThenStep {std::move(lambda)}); }
+private:
+	template <typename Step> auto Append(Step step) const
 	{
-		auto newGivens = std::tuple_cat(givens, std::tuple{std::move(newGiven)});
-		return BDDTest<decltype(newGivens), WhenTuple, ThenTuple>{name, std::move(newGivens), whens, thens};
-	}
-	template <typename NewWhen> auto When(const std::string&, NewWhen newWhen) const { return When(newWhen); }
-	template <typename NewWhen> auto When(NewWhen newWhen) const
-	{
-		auto newWhens = std::tuple_cat(whens, std::tuple{std::move(newWhen)});
-		return BDDTest<GivenTuple, decltype(newWhens), ThenTuple>{name, givens, std::move(newWhens), thens};
-	}
-	template <typename NewThen> auto Then(const std::string&, NewThen newThen) const { return Then(newThen); }
-	template <typename NewThen> auto Then(NewThen newThen) const
-	{
-		auto newThens = std::tuple_cat(thens, std::tuple{std::move(newThen)});
-		return BDDTest<GivenTuple, WhenTuple, decltype(newThens)>{name, givens, whens, std::move(newThens)};
+		auto newSteps = std::tuple_cat(steps, std::tuple{std::move(step)});
+		return BDDTest<decltype(newSteps)>{name, std::move(newSteps)};
 	}
 };
 struct Fluent
 {
-	inline static auto BDD(std::string name) { return BDDTest<std::tuple<>, std::tuple<>, std::tuple<>>{std::move(name),{},{},{}}; }
+	inline static auto BDD(std::string name) { return BDDTest<std::tuple<>>{std::move(name), {}}; }
 };
 
 struct BDDTestSuite : public Test
 {
-	template <typename GivenTuple, typename WhenTuple, typename ThenTuple> BDDTestSuite(BDDTest<GivenTuple, WhenTuple, ThenTuple> def)
-		: Test(def.name, [givens = std::move(def.givens), whens = std::move(def.whens), thens = std::move(def.thens)]()
-							{
-								auto tuple = std::apply([](auto const&... given){	return std::tuple_cat([&]()
-																											{
-																												if constexpr (std::is_void_v<std::invoke_result_t<decltype(given)>>) {
-																													given();
-																													return std::tuple{};
-																												} else
-																													return std::tuple{given()};
-																											}()...
-																							              );       },  givens);
-								std::apply([&](auto const&...  when){ (std::apply(when,               tuple), ...); },  whens);
-								std::apply([&](auto const&...  then){ (std::apply(then, std::as_const(tuple)), ...); }, thens);
-							})
-	{}
+	template <typename StepTuple> BDDTestSuite(BDDTest<StepTuple> def) : Test(def.name, [steps = std::move(def.steps)]() { RecursivelyRunSteps(steps); }) {}
 } bddTests[] =
 {
 	BDDTest { // low-level guts
-		.name   = "can open account with positive funds",
-		.givens = std::tuple{[](                ) { return Bank{0.01}; } },
-		.whens  = std::tuple{[](      auto&     ) { } },
-		.thens  = std::tuple{[](const auto& bank) { Assert::AreWithin(.01, bank.Balance(), .0001); } }
+		.name  = "can open account with positive funds",
+		.steps = std::tuple{ GivenStep{[](                ) { return Bank{0.01}; }},
+		                     WhenStep {[](      auto&     ) { }},
+		                     ThenStep {[](const auto& bank) { Assert::AreWithin(.01, bank.Balance(), .0001); }} }
 	},
 	BDDTest {
 		.name  = "can deposit money into account",
-		.givens = std::tuple{ [](                ) { return Bank{ 0.01 }; } },
-		.whens  = std::tuple{ [](      auto& bank) { bank.Deposit(0.02); },
-                              [](      auto& bank) { bank.Deposit(0.03); } },
-		.thens  = std::tuple{ [](const auto& bank) { Assert::AreWithin(.06, bank.Balance(), .0001); } }
+		.steps = std::tuple{ GivenStep{[](                ) { return Bank{0.01}; }},
+		                     WhenStep {[](      auto& bank) { bank.Deposit(0.02); }},
+		                     WhenStep {[](      auto& bank) { bank.Deposit(0.03); }},
+		                     ThenStep {[](const auto& bank) { Assert::AreWithin(.06, bank.Balance(), .0001); }} }
 	},
 
 
@@ -151,5 +168,14 @@ struct BDDTestSuite : public Test
 		.When ("I deposit $50 into checking",   [](      auto& checking,       auto&        ) { checking.Deposit(50.0); })
 		.Then ("I have $161.11 in checking",	[](const Bank& checking, const auto&        ) { Assert::AreWithin(161.11, checking.Balance(), .0001); })
 		.Then ("I have $172.22 in checking",	[](const Bank&,          const Bank& savings) { Assert::AreWithin(172.22,  savings.Balance(), .0001); })
+	,
+	Fluent::BDD("Let's see what happens if I do oddly ordered steps")
+		.When ("just checking that it doesn't blow up", [](                                ) {})
+		.Given("I open a checking account"            , [](                                ) { return Bank{111.11}; })
+		.When("I deposit $50 into checking"           , [](      auto& checking            ) { checking.Deposit(50.0); })
+		.Then("I have $161.11 in checking"            , [](const Bank& checking            ) { Assert::AreWithin(161.11, checking.Balance(), .0001); })
+		.Given("I open a savings account"             , [](                                ) { return Bank{ 222.22 }; })
+		.When("I withdraw $50 from savings"           , [](      auto&,       Bank& savings) { savings.Withdraw(50.0); })
+		.Then("I have $172.22 in checking"            , [](const Bank&, const Bank& savings) { Assert::AreWithin(172.22,  savings.Balance(), .0001); })
 	,
 };
