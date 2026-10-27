@@ -59,83 +59,91 @@ struct Fluent
 
 struct BDDTestSuite : public Test
 {
+	struct Void{}; // if your Given lambda does not return anything, use this
 	template <typename GivenTuple, typename WhenTuple, typename ThenTuple> BDDTestSuite(BDDTest<GivenTuple, WhenTuple, ThenTuple> def)
 		: Test(def.name, [givens = std::move(def.givens), whens = std::move(def.whens), thens = std::move(def.thens)]()
-			{
-				auto tuple =
-				std::apply([ ](auto const&... given){ return std::tuple{given() ...}; }, givens);
-				std::apply([&](auto const&... when) { (std::apply(when, tuple), ...); }, whens);
-				std::apply([&](auto const&... then) { (std::apply(then, tuple), ...); }, thens);
-			})
+							{
+								auto tuple =
+								std::apply([ ](auto const&... given){ return std::tuple{given() ...}; }, givens);
+								std::apply([&](auto const&...  when){ (std::apply(when, tuple), ...); },  whens);
+								std::apply([&](auto const&...  then){ (std::apply(then, tuple), ...); },  thens);
+							})
 	{}
 } bddTests[] =
 {
-	BDDTest{
+	BDDTest { // low-level guts
 		.name   = "can open account with positive funds",
 		.givens = std::tuple{[](                ) { return Bank{0.01}; } },
 		.whens  = std::tuple{[](      auto&     ) { } },
 		.thens  = std::tuple{[](const auto& bank) { Assert::AreWithin(.01, bank.Balance(), .0001); } }
 	},
-	BDDTest{
-		.name   = "cannot open account with negative funds",
-		.givens = std::tuple{[](           ) { Assert::ExpectingException<std::invalid_argument>([](){ return Bank{-0.01}; }, "cannot open account with negative balance"); return 0; } },
-		.whens  = std::tuple{[](      auto&) { } },
-		.thens  = std::tuple{[](const auto&) { } }
-	},
 	BDDTest {
-		.name   = "depositing money increases balance",
-		.givens = std::tuple{[](                ) { return Bank{100.0}; } },
-		.whens  = std::tuple{[](      auto& bank) { bank.Deposit(50.0); } },
-		.thens  = std::tuple{[](const auto& bank) { Assert::AreWithin(150.0, bank.Balance(), .0001); } }
-	},
-	BDDTest {
-		.name   = "deposit cannot be negative",
-		.givens = std::tuple{[](                ) { return Bank{100.0}; } },
-		.whens  = std::tuple{[](      auto& bank) { Assert::ExpectingException<std::invalid_argument>([&bank]() { return bank.Deposit(-0.01); }, "cannot deposit negative amount"); } },
-		.thens  = std::tuple{[](const auto& bank) { Assert::AreWithin(100.0, bank.Balance(), .0001); } }
-	},
-	BDDTest {
-		.name   = "withdrawing money decreases balance",
-		.givens = std::tuple{[](                ) { return Bank{100.0}; } },
-		.whens  = std::tuple{[](      auto& bank) { bank.Withdraw(50.0); } },
-		.thens  = std::tuple{[](const auto& bank) { Assert::AreWithin(50.0, bank.Balance(), .0001); } }
-	},
-	BDDTest {
-		.name   = "cannot withdraw more than balance",
-		.givens = std::tuple{[](                ) { return Bank{100.0}; } },
-		.whens  = std::tuple{[](      auto& bank) { Assert::ExpectingException<std::invalid_argument>([&bank]() { return bank.Withdraw(100.01); }, "cannot withdraw more than balance"); } },
-		.thens  = std::tuple{[](const auto& bank) { Assert::AreWithin(100.0, bank.Balance(), .0001); } }
-	},
-	BDDTest {
-		.name   = "cannot withdraw negative amount",
-		.givens = std::tuple{[](                ) { return Bank{100.0}; } },
-		.whens  = std::tuple{[](      auto& bank) { Assert::ExpectingException<std::invalid_argument>([&bank]() { return bank.Withdraw(-0.01); }, "cannot withdraw negative amount"); } },
-		.thens  = std::tuple{[](const auto& bank) { Assert::AreWithin(100.0, bank.Balance(), .0001); } }
+		.name  = "can deposit money into account",
+		.givens = std::tuple{ [](                ) { return Bank{ 0.01 }; } },
+		.whens  = std::tuple{ [](      auto& bank) { bank.Deposit(0.02); },
+                              [](      auto& bank) { bank.Deposit(0.03); } },
+		.thens  = std::tuple{ [](const auto& bank) { Assert::AreWithin(.06, bank.Balance(), .0001); } }
 	},
 
-	BDDTest {
-		.name   = "withdrawing money decreases balance",
-		.givens = std::tuple{[](                ) { return Bank{100.0}; } },
-	    .whens  = std::tuple{[](      auto& bank) { bank.Withdraw(50.0); } },
-	    .thens  = std::tuple{[](const auto& bank) { Assert::AreWithin(50.0, bank.Balance(), .0001); } }
-	},
 
+	// the high-level fluent API
+	Fluent::BDD("cannot open account with negative funds")
+		.Given("cannot open an account with a negative balance", []() { Assert::ExpectingException<std::invalid_argument>([]() { return Bank{ -0.01 }; }, "cannot open account with negative balance"); return BDDTestSuite::Void{}; })
+	,
+	Fluent::BDD("depositing money increases balance")
+		.Given("a bank account with a $100.00 balance", [](                ) { return Bank{ 100.0 }; })
+		.When ("I deposit $50.00 more"                , [](      auto& bank) { bank.Deposit(50.0); })
+		.Then ("I have $150.00"                       , [](const auto& bank) { Assert::AreWithin(150.0, bank.Balance(), .0001); })
+	,
+	Fluent::BDD("deposit cannot be negative")
+		.Given("a bank account with a $100.00 balance" , [](                ) { return Bank{100.0}; })
+		.When ("I try to deposit -.01, it doesn't work", [](      auto& bank) { Assert::ExpectingException<std::invalid_argument>([&bank]() { return bank.Deposit(-0.01); }, "cannot deposit negative amount"); })
+		.Then ("I still have the $100.00 balance"      , [](const auto& bank) { Assert::AreWithin(100.0, bank.Balance(), .0001); })
+	,
+	Fluent::BDD("withdrawing money decreases balance")
+		.Given("a bank account with a $100.00 balance", [](                ) { return Bank{100.0}; })
+		.When ("I withdraw $50.00"                    , [](      auto& bank) { bank.Withdraw(50.0); })
+		.Then ("I have a $50.00 balance remaining",     [](const auto& bank) { Assert::AreWithin(50.0, bank.Balance(), .0001); })
+	,
+	Fluent::BDD("cannot withdraw more than balance")
+		.Given("a bank account with a $100.00 balance"                     , [](                ) { return Bank{100.0}; })
+		.When ("I try to withdraw more than my balance, which doesn't work", [](      auto& bank) { Assert::ExpectingException<std::invalid_argument>([&bank]() { return bank.Withdraw(100.01); }, "cannot withdraw more than balance"); })
+		.Then ("I still have the $100.00 balance"                          , [](const auto& bank) { Assert::AreWithin(100.0, bank.Balance(), .0001); })
+	,
+	Fluent::BDD("cannot withdraw negative amount")
+		.Given("a bank account with a $100.00 balance"                  , [](                ) { return Bank{ 100.0 }; })
+		.When ("I try to withdraw a negative amount, which doesn't work", [](      auto& bank) { Assert::ExpectingException<std::invalid_argument>([&bank]() { return bank.Withdraw(-0.01); }, "cannot withdraw negative amount"); })
+		.Then ("I still have the $100.00 balance"                       , [](const auto& bank) { Assert::AreWithin(100.0, bank.Balance(), .0001); })
+	,
+	Fluent::BDD("withdrawing money decreases balance")
+		.Given("a bank account with a $100.00 balance", [](                ) { return Bank{ 100.0 }; })
+		.When ("I withdraw $50.00"                    , [](      auto& bank) { bank.Withdraw(50.0); })
+		.Then ("I have a balance of $50.00"           , [](const auto& bank) { Assert::AreWithin(50.0, bank.Balance(), .0001); })
+	,
 	Fluent::BDD("as a bank customer, I can open an account and deposit money into it")
 		.Given("an open bank account containing $100.00", [](                ) { return Bank{100.0}; })
 		.When ("I deposit $50.00"                       , [](      auto& bank) { bank.Deposit(50.0); })
-		.Then ("the balance should be $150.00"          , [](const auto& bank) { Assert::AreWithin(150.0, bank.Balance(), .0001); }),
-
+		.Then ("the balance should be $150.00"          , [](const auto& bank) { Assert::AreWithin(150.0, bank.Balance(), .0001); })
+	,
 	Fluent::BDD("as a bank customer, I can open an account and withdraw some of the funds")
 		.Given("an open account"      , [](                ) { return Bank{100.0}; })
 		.When ("I withdraw some funds", [](      auto& bank) { bank.Withdraw(75.0);})
-		.Then ("I have $25 remaining" , [](const auto& bank) { Assert::AreWithin(25.0, bank.Balance(), .0001); }),
-
+		.Then ("I have $25 remaining" , [](const auto& bank) { Assert::AreWithin(25.0, bank.Balance(), .0001); })
+	,
 	Fluent::BDD("customer deposits money")
-		.Given([](                                      ) { return "Bill"; })
-		.Given([](                                      ) { return Bank{100.0}; })
-		.When ([](      auto&,                auto& bank) { bank.Deposit(25.0);})
-		.When ([](      auto&,                auto& bank) { bank.Deposit(25.0);})
-		.Then ([](const auto& customer, const auto&     ) { Assert::AreEqual("Bill", customer); })
-		.Then ([](const auto&,          const auto& bank) { Assert::AreWithin(150.0, bank.Balance(), .0001); }),
-
+		.Given("A customer named Mr. MiddleRaster"   , [](                                      ) { return "Mr. MiddleRaster"; })
+		.Given("a bank account with a $100.00 blance", [](                                      ) { return Bank{100.0}; })
+		.When ("he deposits $25.00"                  , [](      auto&,                auto& bank) { bank.Deposit(25.0); })
+		.When ("he deposits $25.00"                  , [](      auto&,                auto& bank) { bank.Deposit(25.0);})
+		.Then ("his name is still Mr. MiddleRaster"  , [](const auto& customer, const auto&     ) { Assert::AreEqual("Mr. MiddleRaster", customer); })
+		.Then ("his balance is $150.00"              , [](const auto&,          const auto& bank) { Assert::AreWithin(150.0, bank.Balance(), .0001); })
+	,
+	Fluent::BDD("Let's see what happens if I create 2 banks")
+		.Given("I open a checking account",     [](                                         ) { return Bank{111.11}; })
+		.Given("I open a savings account" ,     [](                                         ) { return Bank{222.22}; })
+		.When ("I withdraw $50 from savings",   [](      auto&,                Bank& savings) { savings.Withdraw(50.0); })
+		.When ("I deposit $50 into checking",   [](      auto& checking,       auto&        ) { checking.Deposit(50.0); })
+		.Then ("I have $161.11 in checking",	[](const Bank& checking, const auto&        ) { Assert::AreWithin(161.11, checking.Balance(), .0001); })
+		.Then ("I have $172.22 in checking",	[](const Bank&,          const Bank& savings) { Assert::AreWithin(172.22,  savings.Balance(), .0001); })
+	,
 };
