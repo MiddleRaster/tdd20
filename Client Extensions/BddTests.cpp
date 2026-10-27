@@ -59,14 +59,20 @@ struct Fluent
 
 struct BDDTestSuite : public Test
 {
-	struct Void{}; // if your Given lambda does not return anything, use this
 	template <typename GivenTuple, typename WhenTuple, typename ThenTuple> BDDTestSuite(BDDTest<GivenTuple, WhenTuple, ThenTuple> def)
 		: Test(def.name, [givens = std::move(def.givens), whens = std::move(def.whens), thens = std::move(def.thens)]()
 							{
-								auto tuple =
-								std::apply([ ](auto const&... given){ return std::tuple{given() ...}; }, givens);
-								std::apply([&](auto const&...  when){ (std::apply(when, tuple), ...); },  whens);
-								std::apply([&](auto const&...  then){ (std::apply(then, tuple), ...); },  thens);
+								auto tuple = std::apply([](auto const&... given){	return std::tuple_cat([&]()
+																											{
+																												if constexpr (std::is_void_v<std::invoke_result_t<decltype(given)>>) {
+																													given();
+																													return std::tuple{};
+																												} else
+																													return std::tuple{given()};
+																											}()...
+																							              );       },  givens);
+								std::apply([&](auto const&...  when){ (std::apply(when,               tuple), ...); },  whens);
+								std::apply([&](auto const&...  then){ (std::apply(then, std::as_const(tuple)), ...); }, thens);
 							})
 	{}
 } bddTests[] =
@@ -88,7 +94,7 @@ struct BDDTestSuite : public Test
 
 	// the high-level fluent API
 	Fluent::BDD("cannot open account with negative funds")
-		.Given("cannot open an account with a negative balance", []() { Assert::ExpectingException<std::invalid_argument>([]() { return Bank{ -0.01 }; }, "cannot open account with negative balance"); return BDDTestSuite::Void{}; })
+		.Given("cannot open an account with a negative balance", []() { Assert::ExpectingException<std::invalid_argument>([]() { return Bank{-0.01}; }, "cannot open account with negative balance"); })
 	,
 	Fluent::BDD("depositing money increases balance")
 		.Given("a bank account with a $100.00 balance", [](                ) { return Bank{ 100.0 }; })
