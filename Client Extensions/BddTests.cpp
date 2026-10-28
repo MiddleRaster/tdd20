@@ -107,90 +107,92 @@ namespace BDD
 }
 using namespace BDD;
 
+namespace BankSteps
+{   // note the use of packs, in case there are additional Givens
+	inline auto AccountWith(double    balance) { return [=](                          ) { return Bank{ balance }; }; }
+	inline auto Deposit    (double     amount) { return [=](      Bank& bank, auto&...) { bank.Deposit(amount); }; }
+	inline auto Withdraw   (double withdrawal) { return [=](      Bank& bank, auto&...) { bank.Withdraw(withdrawal); }; }
+	inline auto BalanceIs  (double   expected) { return [=](const Bank& bank, auto&...) { Assert::AreWithin(expected, bank.Balance(), .0001); }; }
+}
+
 BDDTestSuite bddTests[] =
 {
-	BDDTest { // low-level guts
+	BDDTest { // low-level guts: not recommended
 		.name  = "can open account with positive funds",
 		.steps = std::tuple{ GivenStep{[](                ) { return Bank{0.01}; }},
 		                     WhenStep {[](      auto&     ) { }},
 		                     ThenStep {[](const auto& bank) { Assert::AreWithin(.01, bank.Balance(), .0001); }} }
 	},
-	BDDTest {
-		.name  = "can deposit money into account",
-		.steps = std::tuple{ GivenStep{[](                ) { return Bank{0.01}; }},
-		                     WhenStep {[](      auto& bank) { bank.Deposit(0.02); }},
-		                     WhenStep {[](      auto& bank) { bank.Deposit(0.03); }},
-		                     ThenStep {[](const auto& bank) { Assert::AreWithin(.06, bank.Balance(), .0001); }} }
-	},
 
-
-	// the high-level fluent API
+	// Gherken-y way
 	Scenario("cannot open account with negative funds")
 		.Given("cannot open an account with a negative balance", []() { Assert::ExpectingException<std::invalid_argument>([]() { return Bank{-0.01}; }, "cannot open account with negative balance"); })
 	,
 	Scenario("depositing money increases balance")
-		.Given("a bank account with a $100.00 balance", [](                ) { return Bank{ 100.0 }; })
-		.When ("I deposit $50.00 more"                , [](      auto& bank) { bank.Deposit(50.0); })
-		.Then ("I have $150.00"                       , [](const auto& bank) { Assert::AreWithin(150.0, bank.Balance(), .0001); })
+		.Given("a bank account with a $100.00 balance"  , [](                ) { return Bank{ 100.0 }; })
+		.When ("I deposit $50.00 more"                  , [](      auto& bank) { bank.Deposit(50.0); })
+		.Then ("I have $150.00"                         , [](const auto& bank) { Assert::AreWithin(150.0, bank.Balance(), .0001); })
 	,
 	Scenario("deposit cannot be negative")
-		.Given("a bank account with a $100.00 balance" , [](                ) { return Bank{100.0}; })
-		.When ("I try to deposit -.01, it doesn't work", [](      auto& bank) { Assert::ExpectingException<std::invalid_argument>([&bank]() { return bank.Deposit(-0.01); }, "cannot deposit negative amount"); })
-		.Then ("I still have the $100.00 balance"      , [](const auto& bank) { Assert::AreWithin(100.0, bank.Balance(), .0001); })
+		.Given("a bank account with a $100.00 balance"  , [](                ) { return Bank{100.0}; })
+		.When ("I try to deposit -.01, it doesn't work" , [](      auto& bank) { Assert::ExpectingException<std::invalid_argument>([&bank]() { return bank.Deposit(-0.01); }, "cannot deposit negative amount"); })
+		.Then ("I still have the $100.00 balance"       , [](const auto& bank) { Assert::AreWithin(100.0, bank.Balance(), .0001); })
 	,
+
+	// demoing reuse
 	Scenario("withdrawing money decreases balance")
-		.Given("a bank account with a $100.00 balance", [](                ) { return Bank{100.0}; })
-		.When ("I withdraw $50.00"                    , [](      auto& bank) { bank.Withdraw(50.0); })
-		.Then ("I have a $50.00 balance remaining",     [](const auto& bank) { Assert::AreWithin(50.0, bank.Balance(), .0001); })
+		.Given("a bank account with a $100.00 balance"  , BankSteps::AccountWith(100.00))
+		.When ("I withdraw $50.00"                      , BankSteps::Withdraw   ( 50.00))
+		.Then ("I have a $50.00 balance remaining"      , BankSteps::BalanceIs  ( 50.00))
 	,
 	Scenario("cannot withdraw more than balance")
-		.Given("a bank account with a $100.00 balance"                     , [](                ) { return Bank{100.0}; })
-		.When ("I try to withdraw more than my balance, which doesn't work", [](      auto& bank) { Assert::ExpectingException<std::invalid_argument>([&bank]() { return bank.Withdraw(100.01); }, "cannot withdraw more than balance"); })
-		.Then ("I still have the $100.00 balance"                          , [](const auto& bank) { Assert::AreWithin(100.0, bank.Balance(), .0001); })
+		.Given("a bank account with a $100.00 balance"  , BankSteps::AccountWith(100.00))
+		.When ("I fail to withdraw more than my balance", [](auto& bank) { Assert::ExpectingException<std::invalid_argument>([&bank]() { return bank.Withdraw(100.01); }, "cannot withdraw more than balance"); })
+		.Then ("I still have the $100.00 balance"       , BankSteps::BalanceIs  (100.00))
 	,
 	Scenario("cannot withdraw negative amount")
-		.Given("a bank account with a $100.00 balance"                  , [](                ) { return Bank{ 100.0 }; })
-		.When ("I try to withdraw a negative amount, which doesn't work", [](      auto& bank) { Assert::ExpectingException<std::invalid_argument>([&bank]() { return bank.Withdraw(-0.01); }, "cannot withdraw negative amount"); })
-		.Then ("I still have the $100.00 balance"                       , [](const auto& bank) { Assert::AreWithin(100.0, bank.Balance(), .0001); })
+		.Given("a bank account with a $100.00 balance"  , BankSteps::AccountWith(100.00))
+		.When ("I fail to withdraw a negative amount"   , [](auto& bank) { Assert::ExpectingException<std::invalid_argument>([&bank]() { return bank.Withdraw(-0.01); }, "cannot withdraw negative amount"); })
+		.Then ("I still have the $100.00 balance"       , BankSteps::BalanceIs(100.00))
 	,
 	Scenario("withdrawing money decreases balance")
-		.Given("a bank account with a $100.00 balance", [](                ) { return Bank{ 100.0 }; })
-		.When ("I withdraw $50.00"                    , [](      auto& bank) { bank.Withdraw(50.0); })
-		.Then ("I have a balance of $50.00"           , [](const auto& bank) { Assert::AreWithin(50.0, bank.Balance(), .0001); })
+		.Given("a bank account with a $100.00 balance"  , BankSteps::AccountWith(100.00))
+		.When ("I withdraw $50.00"                      , BankSteps::Withdraw   ( 50.00))
+		.Then ("I have a balance of $50.00"             , BankSteps::BalanceIs  ( 50.00))
 	,
 	Scenario("as a bank customer, I can open an account and deposit money into it")
-		.Given("an open bank account containing $100.00", [](                ) { return Bank{100.0}; })
-		.When ("I deposit $50.00"                       , [](      auto& bank) { bank.Deposit(50.0); })
-		.Then ("the balance should be $150.00"          , [](const auto& bank) { Assert::AreWithin(150.0, bank.Balance(), .0001); })
+		.Given("an open bank account containing $100.00", BankSteps::AccountWith(100.00))
+		.When ("I deposit $50.00"                       , BankSteps::Deposit    ( 50.00))
+		.Then ("the balance should be $150.00"          , BankSteps::BalanceIs  (150.00))
 	,
 	Scenario("as a bank customer, I can open an account and withdraw some of the funds")
-		.Given("an open account"      , [](                ) { return Bank{100.0}; })
-		.When ("I withdraw some funds", [](      auto& bank) { bank.Withdraw(75.0);})
-		.Then ("I have $25 remaining" , [](const auto& bank) { Assert::AreWithin(25.0, bank.Balance(), .0001); })
+		.Given("an open account"                        , BankSteps::AccountWith(100.00))
+		.When ("I withdraw some funds"                  , BankSteps::Withdraw   ( 75.00))
+		.Then ("I have $25 remaining"                   , BankSteps::BalanceIs  ( 25.00))
 	,
 	Scenario("customer deposits money")
-		.Given("A customer named Mr. MiddleRaster"   , [](                                      ) { return "Mr. MiddleRaster"; })
-		.Given("a bank account with a $100.00 blance", [](                                      ) { return Bank{100.0}; })
-		.When ("he deposits $25.00"                  , [](      auto&,                auto& bank) { bank.Deposit(25.0); })
-		.When ("he deposits $25.00"                  , [](      auto&,                auto& bank) { bank.Deposit(25.0);})
-		.Then ("his name is still Mr. MiddleRaster"  , [](const auto& customer, const auto&     ) { Assert::AreEqual("Mr. MiddleRaster", customer); })
-		.And  ("his balance is $150.00"              , [](const auto&,          const auto& bank) { Assert::AreWithin(150.0, bank.Balance(), .0001); })
+		.Given("A customer named Mr. MiddleRaster"      , [](                                      ) { return "Mr. MiddleRaster"; })
+		.Given("a bank account with a $100.00 blance"   , BankSteps::AccountWith(100.00))
+		.When ("he deposits $25.00"                     , [](      auto&,                auto& bank) { bank.Deposit(25.0); })
+		.When ("he deposits $25.00"                     , [](      auto&,                auto& bank) { bank.Deposit(25.0);})
+		.Then ("his name is still Mr. MiddleRaster"     , [](const auto& customer, const auto&     ) { Assert::AreEqual("Mr. MiddleRaster", customer); })
+		.And  ("his balance is $150.00"                 , [](const auto&,          const auto& bank) { Assert::AreWithin(150.0, bank.Balance(), .0001); })
 	,
 	Scenario("Let's see what happens if I create 2 banks")
-		.Given("I open a checking account"	, [](                                         ) { return Bank{111.11}; })
-		.Given("I open a savings account"	, [](                                         ) { return Bank{222.22}; })
-		.When ("I withdraw $50 from savings", [](      auto&,                Bank& savings) { savings.Withdraw(50.0); })
-		.When ("I deposit $50 into checking", [](      auto& checking,       auto&        ) { checking.Deposit(50.0); })
-		.Then ("I have $161.11 in checking"	, [](const Bank& checking, const auto&        ) { Assert::AreWithin(161.11, checking.Balance(), .0001); })
-		.But  ("I have $172.22 in savings"	, [](const Bank&,          const Bank& savings) { Assert::AreWithin(172.22,  savings.Balance(), .0001); })
+		.Given("I open a checking account"	            , BankSteps::AccountWith(111.11))
+		.Given("I open a savings account"	            , BankSteps::AccountWith(222.22))
+		.When ("I withdraw $50 from savings"            , [](      auto&,                Bank& savings) { savings.Withdraw(50.0); }) // cannot use BankSteps because it's the second bank, thus the second arg
+		.When ("I deposit $50 into checking"            , BankSteps::Deposit    ( 50.00))
+		.Then ("I have $161.11 in checking"	            , BankSteps::BalanceIs  (161.11))
+		.But  ("I have $172.22 in savings"	            , [](const Bank&,          const Bank& savings) { Assert::AreWithin(172.22,  savings.Balance(), .0001); }) // ditto
 	,
 	Scenario("Let's see what happens if I do oddly ordered steps")
-		.When ("just checking that it doesn't blow up", [](                                ) {})
-		.Given("I open a checking account"            , [](                                ) { return Bank{111.11}; })
-		.When("I deposit $50 into checking"           , [](      auto& checking            ) { checking.Deposit(50.0); })
-		.Then("I have $161.11 in checking"            , [](const Bank& checking            ) { Assert::AreWithin(161.11, checking.Balance(), .0001); })
-		.Given("I open a savings account"             , [](                                ) { return Bank{ 222.22 }; })
-		.When("I withdraw $50 from savings"           , [](      auto&,       Bank& savings) { savings.Withdraw(50.0); })
-		.Then("I have $172.22 in checking"            , [](const Bank&, const Bank& savings) { Assert::AreWithin(172.22,  savings.Balance(), .0001); })
+		.When ("no Given, it compiles anyway"           , []() {})
+		.Given("I open a checking account"              , BankSteps::AccountWith(111.11))
+		.When("I deposit $50 into checking"             , BankSteps::Deposit    ( 50.00))
+		.Then("I have $161.11 in checking"              , BankSteps::BalanceIs  (161.11))
+		.Given("I open a savings account"               , BankSteps::AccountWith(222.22)) // second account => second "Bank" arg => cannot use existing BankSteps,
+		.When("I withdraw $50 from savings"             , [](      auto&,       Bank& savings) { savings.Withdraw(50.0); }) // though we could easily write such reusable steps using the second Bank&
+		.Then("I have $172.22 in checking"              , [](const Bank&, const Bank& savings) { Assert::AreWithin(172.22, savings.Balance(), .0001); })
 	,
 };
