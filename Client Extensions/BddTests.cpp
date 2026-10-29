@@ -112,7 +112,8 @@ namespace BankSteps
 	inline auto AccountWith(double    balance) { return [=](                          ) { return Bank{ balance }; }; }
 	inline auto Deposit    (double     amount) { return [=](      Bank& bank, auto&...) { bank.Deposit(amount); }; }
 	inline auto Withdraw   (double withdrawal) { return [=](      Bank& bank, auto&...) { bank.Withdraw(withdrawal); }; }
-	inline auto BalanceIs  (double   expected) { return [=](const Bank& bank, auto&...) { Assert::AreWithin(expected, bank.Balance(), .0001); }; }
+	inline auto BalanceIs  (double   expected, std::source_location loc=std::source_location::current()) // passing call site info along to aid in debugging
+											   { return [=](const Bank& bank, auto&...) { Assert::AreWithin(expected, bank.Balance(), .0001, "step failure in BalanceIs", loc); }; }
 }
 
 BDDTestSuite bddTests[] =
@@ -196,3 +197,24 @@ BDDTestSuite bddTests[] =
 		.Then("I have $172.22 in checking"              , [](const Bank&, const Bank& savings) { Assert::AreWithin(172.22, savings.Balance(), .0001); })
 	,
 };
+
+struct DepositWithdrawOutline
+{
+	DepositWithdrawOutline()
+	{
+		for (const auto& [initial, deposit, withdrawal, balance] : std::array {
+				std::tuple{100.00,   50.00,      25.00,  125.00},
+				std::tuple{  0.00,   50.00,      50.00,    0.00},
+			})
+		{
+			BDDTestSuite{
+				Scenario  (std::format("initial ${:.2f}, deposit ${:.2f}, withdraw ${:.2f}, yields ${:.2f}", initial, deposit, withdrawal, balance))
+					.Given(std::format("a bank account with a ${:.2f} balance", initial),    BankSteps::AccountWith(initial))
+					.When (std::format("I deposit ${:.2f}"                    , deposit),    BankSteps::Deposit    (deposit))
+					.And  (std::format("I withdraw ${:.2f}"                   , withdrawal), BankSteps::Withdraw(withdrawal))
+					.Then (std::format("I have a ${:.2f} balance"             , balance),    BankSteps::BalanceIs  (balance))
+			};
+		}
+	}
+};
+inline DepositWithdrawOutline depositWithdrawOutline;
