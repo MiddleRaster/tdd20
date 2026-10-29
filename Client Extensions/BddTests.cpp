@@ -194,7 +194,7 @@ BDDTestSuite bddTests[] =
 		.Then("I have $161.11 in checking"              , BankSteps::BalanceIs  (161.11))
 		.Given("I open a savings account"               , BankSteps::AccountWith(222.22)) // second account => second "Bank" arg => cannot use existing BankSteps,
 		.When("I withdraw $50 from savings"             , [](      auto&,       Bank& savings) { savings.Withdraw(50.0); }) // though we could easily write such reusable steps using the second Bank&
-		.Then("I have $172.22 in checking"              , [](const Bank&, const Bank& savings) { Assert::AreWithin(172.22, savings.Balance(), .0001); })
+		.Then("I have $172.22 in savings"               , [](const Bank&, const Bank& savings) { Assert::AreWithin(172.22, savings.Balance(), .0001); })
 	,
 };
 
