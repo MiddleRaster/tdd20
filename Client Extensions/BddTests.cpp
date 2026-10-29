@@ -173,7 +173,7 @@ BDDTestSuite bddTests[] =
 	,
 	Scenario("customer deposits money")
 		.Given("A customer named Mr. MiddleRaster"      , [](                                      ) { return "Mr. MiddleRaster"; })
-		.Given("a bank account with a $100.00 blance"   , BankSteps::AccountWith(100.00))
+		.Given("a bank account with a $100.00 balance"  , BankSteps::AccountWith(100.00))
 		.When ("he deposits $25.00"                     , [](      auto&,                auto& bank) { bank.Deposit(25.0); })
 		.When ("he deposits $25.00"                     , [](      auto&,                auto& bank) { bank.Deposit(25.0);})
 		.Then ("his name is still Mr. MiddleRaster"     , [](const auto& customer, const auto&     ) { Assert::AreEqual("Mr. MiddleRaster", customer); })
