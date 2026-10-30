@@ -156,7 +156,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Client Extensions\BddTests.cpp" />
+    <ClCompile Include="..\Client Extensions\BDD_Gherkin.cpp" />
     <ClCompile Include="..\Client Extensions\BDD_RSpec.cpp" />
     <ClCompile Include="..\Client Extensions\CustomToString.cpp" />
     <ClCompile Include="..\Client Extensions\RetryingTests.cpp" />
