@@ -170,13 +170,14 @@ using namespace RSpec;
 
 auto Spec = (
 Describe("Bank") = []() { return Bank{}; }
-	, Describe("with sufficient funds")        = [](      Bank& bank) { bank.Deposit(100.00); }
-		, Context("withdrawal")                = [](      Bank& bank) { bank.Withdraw(50.00); }
+	, Describe("with sufficient funds")        = BankSteps::Deposit(100.00)
+		, Context("withdrawal")                = BankSteps::Withdraw(50.00)
 			, It("reduces the balance")        = [](const Bank& bank) { Assert::IsTrue(100.00 > bank.Balance(), "balance should be less than 100.0"); }
-			, It("the balance is nonnegative") = [](const Bank& bank) { Assert::AreWithin(50.01, bank.Balance(), 0.0001); }
+			, It("the balance is nonnegative") = [](const Bank& bank) { Assert::IsTrue( 0.00 <= bank.Balance(), "balance cannot go negative"); }
+			, It("the balance is $50.00")      = [](const Bank& bank) { Assert::AreWithin(50.00, bank.Balance(), 0.0001); }
 			, Up()
 		, Up()
-	, Describe("with insufficient funds")      = BankSteps::Deposit ( 0.01)
-		, Context("withdrawal")                = BankSteps::Withdraw(50.00)
+	, Describe("with insufficient funds")      = [](      Bank& bank) { bank.Deposit(0.01); }
+		, Context("withdrawal")                = [](      Bank& bank) { Assert::ExpectingException<std::invalid_argument>([&bank]() { return bank.Withdraw(50.00); }, "cannot withdraw more than balance"); }
 			, It("raises an error")            = [](const Bank&     ) { /* already threw, above */ }
 );
