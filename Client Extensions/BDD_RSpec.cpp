@@ -80,7 +80,8 @@ namespace RSpec
 				} else
 					return std::tuple{std::invoke(setup)};
 			};
-		if (0 == (std::size_t{0} + ... + children(name, ancestor)))
+		auto count = (std::size_t{0} + ... + children(name, ancestor));
+		if (count == 0)
 			TDD20::Test(name, [ancestor]() mutable { ancestor(); });
 
 		return {};
