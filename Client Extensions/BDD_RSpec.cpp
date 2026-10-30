@@ -33,61 +33,90 @@ namespace RSpec
 	{
 		return [ancestor=std::forward<Ancestor>(ancestor), setup=std::forward<Setup>(setup)]() mutable
 			{
-				auto result = ancestor();
-				if constexpr (std::is_void_v<std::invoke_result_t<Setup&, decltype(result)&>>) {
+				auto result  = ancestor();
+				using Result = std::invoke_result_t<decltype(setup)&, decltype(result)&>;
+				if constexpr (std::is_void_v<Result>) {
 					std::invoke(setup, result);
 					return result;
-				} else
-					return std::invoke(setup, result);
+				} else {
+					auto added = std::invoke(setup, result);
+					return std::tuple_cat(std::move(result), std::tuple<std::remove_cvref_t<Result>>{std::move(added)});
+				}
 			};
 	}
 	template <typename Test> auto It(std::string name, Test&& test)
 	{
 		return [name=std::move(name), test=std::forward<Test>(test)](std::string path, auto ancestor) mutable
 			{
-				TDD20::Test(path + " " + name, [ancestor, test]() mutable
+				TDD20::Test(path + " " + name, [ancestor, test=std::move(test)]() mutable
 					{
 						auto result = ancestor();
 						std::invoke(test, result);
 					});
+				return std::size_t{1}; // for count in Describe and Context
 			};
 	}
-	template<typename Setup, typename... Children> auto Context(std::string name, Setup setup, Children&&... children)
+	template <typename Setup, typename... Children> auto Context(std::string name, Setup&& setup, Children&&... children)
 	{
-		return [name=std::move(name), setup=std::move(setup), ...children=std::forward<Children>(children)](std::string path, auto ancestor) mutable
+		return [name=std::move(name), setup=std::forward<Setup>(setup), ...children=std::forward<Children>(children)](std::string path, auto ancestor) mutable
 			{
 				auto combined = Compose(ancestor, setup);
 				path += " " + name;
-				(children(path, combined), ...);
+				auto count = (std::size_t{0} + ... + children(path, combined));
+				if (count == 0) {
+					TDD20::Test(path, [combined]() mutable { combined(); });
+					count = 1;
+				}
+				return count;
 			};
 	}
 	template <typename Setup, typename... Children> Specification Describe(std::string name, Setup&& setup, Children&&... children)
 	{
-		auto ancestor = [setup=std::forward<Setup>(setup)]() mutable { return std::invoke(setup); };
-		(children(name, ancestor), ...);
+		auto ancestor = [setup=std::forward<Setup>(setup)]() mutable
+			{
+				if constexpr (std::is_void_v<std::invoke_result_t<decltype(setup)&>>) {
+					std::invoke(setup);
+					return std::tuple{};
+				} else
+					return std::tuple{std::invoke(setup)};
+			};
+		if (0 == (std::size_t{0} + ... + children(name, ancestor)))
+			TDD20::Test(name, [ancestor]() mutable { ancestor(); });
+
 		return {};
 	}
 }
 
 namespace BankSteps
 {
-	inline auto Deposit (double amount) { return [amount](Bank& bank) { bank.Deposit (amount); }; }
-	inline auto Withdraw(double amount) { return [amount](Bank& bank) { bank.Withdraw(amount); }; }
+	inline auto Deposit (double amount) { return [amount](auto& tuple) { auto& [bank]=tuple; bank.Deposit (amount); }; }
+	inline auto Withdraw(double amount) { return [amount](auto& tuple) { auto& [bank]=tuple; bank.Withdraw(amount); }; }
 }
 
 using namespace RSpec;
 
-auto spec = 
+Specification specs[] = {
 	Describe("Bank", []() { return Bank{}; },
-		It("starts with a zero balance"             , [](Bank& bank) { Assert::AreWithin( 0.00, bank.Balance(), 0.0001); }),
+		It("starts with a zero balance"             , [](auto& tuple) { auto& [bank]=tuple; Assert::AreWithin( 0.00, bank.Balance(), 0.0001); }),
 		Context("with sufficient funds"             , BankSteps::Deposit(100.00),
 			Context("withdrawal"                    , BankSteps::Withdraw(50.00),
-				It("reduces the balance"            , [](Bank& bank) { Assert::IsTrue (100.00 > bank.Balance(), "balance should be less than 100.0"); }),
-				It("the balance is nonnegative"     , [](Bank& bank) { Assert::IsTrue ( 0.00 <= bank.Balance(), "balance cannot go negative"); }),
-				It("the balance is $50.00"          , [](Bank& bank) { Assert::AreWithin(50.00, bank.Balance(), 0.0001); })
+				It("reduces the balance"            , [](auto& tuple) { auto& [bank]=tuple; Assert::IsTrue (100.00 > bank.Balance(), "balance should be less than 100.0"); }),
+				It("the balance is nonnegative"     , [](auto& tuple) { auto& [bank]=tuple; Assert::IsTrue ( 0.00 <= bank.Balance(), "balance cannot go negative"); }),
+				It("the balance is $50.00"          , [](auto& tuple) { auto& [bank]=tuple; Assert::AreWithin(50.00, bank.Balance(), 0.0001); })
 			)
 		),
-		Context("withdrawal with insufficient funds", [](Bank& bank) { bank.Deposit(0.01); },
-			It("raises an error"                    , [](Bank& bank) { Assert::ExpectingException<std::invalid_argument>([&bank]() { bank.Withdraw(50.00); }, "cannot withdraw more than balance"); })
+		Context("account belonging to MiddleRaster"     , [](auto&      ) { return "MiddleRaster"; },
+			Context("withdrawal with insufficient funds", [](auto& tuple) { auto& [bank,customer]=tuple; bank.Deposit(0.01); },
+				It("is the same customer"               , [](auto& tuple) { auto& [bank,customer]=tuple; Assert::AreEqual("MiddleRaster", customer, "wrong customer!"); }),
+				It("raises an error"                    , [](auto& tuple) { auto& [bank,customer]=tuple; Assert::ExpectingException<std::invalid_argument>([&bank]() { bank.Withdraw(50.00); }, "cannot withdraw more than balance"); })
+			)
 		)
-	);
+	),
+	Describe("returning void", [](){},	// Describe's Setup returns void
+		It("is ok",  [](auto&) {})		// tuple is empty
+	),
+	Describe("impossible opening of account with a negative balance", []() { Assert::ExpectingException<std::invalid_argument>([]() { return Bank{-0.001}; }, "cannot open account with negative balance"); }
+	),
+	Describe("some customer"      , []() { return "MiddleRaster"; },
+		Context("is not pseudonym", [](auto& tuple) { auto& [customer] = tuple; Assert::ExpectingException<TDD20::AssertException>([&customer]() { Assert::AreNotEqual("MiddleRaster", customer); }); })),
+};
