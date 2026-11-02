@@ -24,22 +24,6 @@ jobs:
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v3
 
-    - name: Diagnostic Info
-      shell: cmd
-      run: |
-        echo ===== MSBuild =====
-        where msbuild
-        msbuild -version
-
-        echo.
-        echo ===== Visual Studio =====
-        if defined VSINSTALLDIR echo VSINSTALLDIR=%VSINSTALLDIR%
-        if defined VCToolsInstallDir echo VCToolsInstallDir=%VCToolsInstallDir%
-
-        echo.
-        echo ===== Environment =====
-        set VS
-
     - name: Build
       working-directory: ${{ github.workspace }}
       shell: cmd
