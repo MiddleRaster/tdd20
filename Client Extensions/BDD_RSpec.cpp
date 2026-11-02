@@ -103,7 +103,7 @@ namespace BankSteps
 using namespace RSpec;
 
 Specification specs[] = {
-	Describe("Bank", []() { return Bank{}; },
+	Describe("[RSpec] Bank", []() { return Bank{}; },
 		It("starts with a zero balance"             , [](auto& bank) { Assert::AreWithin( 0.00, bank.Balance(), 0.0001); }),
 		Context("with sufficient funds"             , BankSteps::Deposit(100.00),
 			Context("withdrawal"                    , BankSteps::Withdraw(50.00),
@@ -119,11 +119,11 @@ Specification specs[] = {
 			)
 		)
 	),
-	Describe("returning void", [](){},	// Describe's Setup returns void
+	Describe("[RSpec] returning void", [](){},	// Describe's Setup returns void
 		It("is ok",  [](auto&) {})		// tuple is empty
 	),
-	Describe("impossible opening of account with a negative balance", []() { Assert::ExpectingException<std::invalid_argument>([]() { return Bank{-0.001}; }, "cannot open account with negative balance"); }
+	Describe("[RSpec] impossible opening of account with a negative balance", []() { Assert::ExpectingException<std::invalid_argument>([]() { return Bank{-0.001}; }, "cannot open account with negative balance"); }
 	),
-	Describe("some customer's name", []() { return "MiddleRaster"; },
+	Describe("[RSpec] some customer's name", []() { return "MiddleRaster"; },
 		Context("is not pseudonym" , [](auto& customer) { Assert::ExpectingException<TDD20::AssertException>([&customer]() { Assert::AreNotEqual("MiddleRaster", customer); }); })),
 };

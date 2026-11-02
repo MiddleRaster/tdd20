@@ -119,59 +119,59 @@ namespace BankSteps
 BDDTestSuite bddTests[] =
 {
 	BDDTest { // low-level guts: not recommended
-		.name  = "can open account with positive funds",
+		.name  = "[Gherkin] can open account with positive funds",
 		.steps = std::tuple{ GivenStep{[](                ) { return Bank{0.01}; }},
 		                     WhenStep {[](      auto&     ) { }},
 		                     ThenStep {[](const auto& bank) { Assert::AreWithin(.01, bank.Balance(), .0001); }} }
 	},
 
 	// Gherken-y way
-	Scenario("cannot open account with negative funds")
+	Scenario("[Gherkin] cannot open account with negative funds")
 		.Given("cannot open an account with a negative balance", []() { Assert::ExpectingException<std::invalid_argument>([]() { return Bank{-0.01}; }, "cannot open account with negative balance"); })
 	,
-	Scenario("depositing money increases balance")
+	Scenario("[Gherkin] depositing money increases balance")
 		.Given("a bank account with a $100.00 balance"  , [](                ) { return Bank{ 100.0 }; })
 		.When ("I deposit $50.00 more"                  , [](      auto& bank) { bank.Deposit(50.0); })
 		.Then ("I have $150.00"                         , [](const auto& bank) { Assert::AreWithin(150.0, bank.Balance(), .0001); })
 	,
-	Scenario("deposit cannot be negative")
+	Scenario("[Gherkin] deposit cannot be negative")
 		.Given("a bank account with a $100.00 balance"  , [](                ) { return Bank{100.0}; })
 		.When ("I try to deposit -.01, it doesn't work" , [](      auto& bank) { Assert::ExpectingException<std::invalid_argument>([&bank]() { return bank.Deposit(-0.01); }, "cannot deposit negative amount"); })
 		.Then ("I still have the $100.00 balance"       , [](const auto& bank) { Assert::AreWithin(100.0, bank.Balance(), .0001); })
 	,
 
 	// demoing reuse
-	Scenario("withdrawing money decreases balance")
+	Scenario("[Gherkin] withdrawing money decreases balance")
 		.Given("a bank account with a $100.00 balance"  , BankSteps::AccountWith(100.00))
 		.When ("I withdraw $50.00"                      , BankSteps::Withdraw   ( 50.00))
 		.Then ("I have a $50.00 balance remaining"      , BankSteps::BalanceIs  ( 50.00))
 	,
-	Scenario("cannot withdraw more than balance")
+	Scenario("[Gherkin] cannot withdraw more than balance")
 		.Given("a bank account with a $100.00 balance"  , BankSteps::AccountWith(100.00))
 		.When ("I fail to withdraw more than my balance", [](auto& bank) { Assert::ExpectingException<std::invalid_argument>([&bank]() { return bank.Withdraw(100.01); }, "cannot withdraw more than balance"); })
 		.Then ("I still have the $100.00 balance"       , BankSteps::BalanceIs  (100.00))
 	,
-	Scenario("cannot withdraw negative amount")
+	Scenario("[Gherkin] cannot withdraw negative amount")
 		.Given("a bank account with a $100.00 balance"  , BankSteps::AccountWith(100.00))
 		.When ("I fail to withdraw a negative amount"   , [](auto& bank) { Assert::ExpectingException<std::invalid_argument>([&bank]() { return bank.Withdraw(-0.01); }, "cannot withdraw negative amount"); })
 		.Then ("I still have the $100.00 balance"       , BankSteps::BalanceIs(100.00))
 	,
-	Scenario("withdrawing money decreases balance")
+	Scenario("[Gherkin] withdrawing money decreases balance")
 		.Given("a bank account with a $100.00 balance"  , BankSteps::AccountWith(100.00))
 		.When ("I withdraw $50.00"                      , BankSteps::Withdraw   ( 50.00))
 		.Then ("I have a balance of $50.00"             , BankSteps::BalanceIs  ( 50.00))
 	,
-	Scenario("as a bank customer, I can open an account and deposit money into it")
+	Scenario("[Gherkin] as a bank customer, I can open an account and deposit money into it")
 		.Given("an open bank account containing $100.00", BankSteps::AccountWith(100.00))
 		.When ("I deposit $50.00"                       , BankSteps::Deposit    ( 50.00))
 		.Then ("the balance should be $150.00"          , BankSteps::BalanceIs  (150.00))
 	,
-	Scenario("as a bank customer, I can open an account and withdraw some of the funds")
+	Scenario("[Gherkin] as a bank customer, I can open an account and withdraw some of the funds")
 		.Given("an open account"                        , BankSteps::AccountWith(100.00))
 		.When ("I withdraw some funds"                  , BankSteps::Withdraw   ( 75.00))
 		.Then ("I have $25 remaining"                   , BankSteps::BalanceIs  ( 25.00))
 	,
-	Scenario("customer deposits money")
+	Scenario("[Gherkin] customer deposits money")
 		.Given("A customer named Mr. MiddleRaster"      , [](                                      ) { return "Mr. MiddleRaster"; })
 		.Given("a bank account with a $100.00 balance"  , BankSteps::AccountWith(100.00))
 		.When ("he deposits $25.00"                     , [](      auto&,                auto& bank) { bank.Deposit(25.0); })
@@ -179,7 +179,7 @@ BDDTestSuite bddTests[] =
 		.Then ("his name is still Mr. MiddleRaster"     , [](const auto& customer, const auto&     ) { Assert::AreEqual("Mr. MiddleRaster", customer); })
 		.And  ("his balance is $150.00"                 , [](const auto&,          const auto& bank) { Assert::AreWithin(150.0, bank.Balance(), .0001); })
 	,
-	Scenario("Let's see what happens if I create 2 banks")
+	Scenario("[Gherkin] Let's see what happens if I create 2 banks")
 		.Given("I open a checking account"	            , BankSteps::AccountWith(111.11))
 		.Given("I open a savings account"	            , BankSteps::AccountWith(222.22))
 		.When ("I withdraw $50 from savings"            , [](      auto&,                Bank& savings) { savings.Withdraw(50.0); }) // cannot use BankSteps because it's the second bank, thus the second arg
@@ -187,7 +187,7 @@ BDDTestSuite bddTests[] =
 		.Then ("I have $161.11 in checking"	            , BankSteps::BalanceIs  (161.11))
 		.But  ("I have $172.22 in savings"	            , [](const Bank&,          const Bank& savings) { Assert::AreWithin(172.22,  savings.Balance(), .0001); }) // ditto
 	,
-	Scenario("Let's see what happens if I do oddly ordered steps")
+	Scenario("[Gherkin] Let's see what happens if I do oddly ordered steps")
 		.When ("no Given, it compiles anyway"           , []() {})
 		.Given("I open a checking account"              , BankSteps::AccountWith(111.11))
 		.When("I deposit $50 into checking"             , BankSteps::Deposit    ( 50.00))

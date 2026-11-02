@@ -54,7 +54,13 @@
     <ClCompile Include="..\Client Extensions\RetryingTests.cpp">
       <Filter>Client Extensions</Filter>
     </ClCompile>
-    <ClCompile Include="..\Client Extensions\BddTests.cpp">
+    <ClCompile Include="..\Client Extensions\BDD_Gherkin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Client Extensions\BDD_RSpec.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Client Extensions\BDD_BoBW.cpp">
       <Filter>Client Extensions</Filter>
     </ClCompile>
   </ItemGroup>
