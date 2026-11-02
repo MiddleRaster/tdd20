@@ -27,15 +27,18 @@ jobs:
     - name: Diagnostic Info
       shell: cmd
       run: |
-        echo ===== Environment =====
-        set VisualStudio
-        echo.
         echo ===== MSBuild =====
         where msbuild
         msbuild -version
+
         echo.
-        echo ===== VC Tools =====
-        dir /b "C:\Program Files\Microsoft Visual Studio\*\*\VC\Tools\MSVC" 2>nul
+        echo ===== Visual Studio =====
+        if defined VSINSTALLDIR echo VSINSTALLDIR=%VSINSTALLDIR%
+        if defined VCToolsInstallDir echo VCToolsInstallDir=%VCToolsInstallDir%
+
+        echo.
+        echo ===== Environment =====
+        set VS
 
     - name: Build
       working-directory: ${{ github.workspace }}
