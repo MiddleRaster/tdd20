@@ -43,10 +43,4 @@ jobs:
     - name: Build
       working-directory: ${{ github.workspace }}
       shell: cmd
-      run: |
-        msbuild ^
-          /restore ^
-          /p:Configuration=${{ env.BUILD_CONFIGURATION }} ^
-          /p:Platform=${{ env.BUILD_PLATFORM }} ^
-          /p:PlatformToolset=v143 ^
-          ${{ env.SOLUTION_FILE_PATH }}
+      run: msbuild /restore /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=x64 /p:PlatformToolset=v143 ${{env.SOLUTION_FILE_PATH}}
