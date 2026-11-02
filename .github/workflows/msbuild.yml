@@ -27,4 +27,6 @@ jobs:
     - name: Build
       working-directory: ${{ github.workspace }}
       shell: cmd
-      run: msbuild /restore /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=x64 /p:PlatformToolset=v143 ${{env.SOLUTION_FILE_PATH}}
+      run: |
+        call "%ProgramFiles%\Microsoft Visual Studio\18\Enterprise\Common7\Tools\VsDevCmd.bat" -host_arch=x64 -arch=x64
+        msbuild /restore /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=x64 /p:PlatformToolset=v143 ${{env.SOLUTION_FILE_PATH}}
