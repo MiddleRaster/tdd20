@@ -50,8 +50,7 @@ namespace BoBW
 				if constexpr (std::is_void_v<Result>) {
 					InvokeWithSingleParamOrTuple(setup, result);
 					return result;
-				}
-				else {
+				} else {
 					auto added = InvokeWithSingleParamOrTuple(setup, result);
 					return std::tuple_cat(std::move(result), std::tuple<std::remove_cvref_t<Result>>{std::move(added)});
 				}
