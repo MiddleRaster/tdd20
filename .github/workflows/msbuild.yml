@@ -33,6 +33,14 @@ jobs:
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v3
 
+    - name: Compiler Info
+      shell: cmd
+      run: |
+        where cl
+        cl
+        echo VSCMD_ARG_HOST_ARCH=%VSCMD_ARG_HOST_ARCH%
+        echo VSCMD_ARG_TGT_ARCH=%VSCMD_ARG_TGT_ARCH%
+
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
