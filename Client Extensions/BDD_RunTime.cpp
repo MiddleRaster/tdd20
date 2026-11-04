@@ -51,7 +51,7 @@ namespace BDD_Runtime
 
 		static Ancestor Compose(Ancestor ancestor, Setup setup)
 		{
-			return [ancestor = std::move(ancestor), setup = std::move(setup)]() mutable
+			return [ancestor=std::move(ancestor), setup=std::move(setup)]() mutable
 				{
 					State state = ancestor();
 					std::any added = setup(state);
@@ -61,19 +61,17 @@ namespace BDD_Runtime
 		}
 		template <typename Callable> static Setup Adapt(Callable callable)
 		{
-			constexpr bool takesNothing = std::is_invocable_v<Callable&>;
-			constexpr bool takesState   = std::is_invocable_v<Callable&, State&>;
-			static_assert(takesNothing || takesState || std::tuple_size_v<typename Traits<Callable>::Params> == 1, "a step takes no parameter, the State, or one typed value");
-			return [callable](State& state) mutable -> std::any
+			return [callable=std::move(callable)](State& state) mutable -> std::any
 				{
 					auto run = [&callable](auto&&... args) -> std::any
 						{
 							if constexpr (std::is_void_v<decltype(callable(std::forward<decltype(args)>(args)...))>) {        callable(std::forward<decltype(args)>(args)...); return {}; }
 							else                                                                                     { return callable(std::forward<decltype(args)>(args)...); }
 						};
-					if      constexpr (takesNothing) return (void)state, run();
-					else if constexpr (takesState  ) return run(state);
+					if      constexpr (std::is_invocable_v<Callable&        >) return (void)state, run();
+					else if constexpr (std::is_invocable_v<Callable&, State&>) return run(state);
 					else {
+						static_assert(std::tuple_size_v<typename Traits<Callable>::Params> == 1, "a step takes one typed value");
 						if (state.size() != 1) throw std::logic_error("a single-value step requires exactly one Given value; take State& instead");
 						return run(std::any_cast<std::remove_cvref_t<std::tuple_element_t<0,typename Traits<Callable>::Params>>&>(state[0]));
 					}
