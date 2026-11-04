@@ -51,7 +51,7 @@ namespace BDD_Runtime
 
 		static Ancestor Compose(Ancestor ancestor, Setup setup)
 		{
-			return [ancestor = std::move(ancestor), setup = std::move(setup)]() mutable
+			return [ancestor=std::move(ancestor), setup = std::move(setup)]() mutable
 				{
 					State state = ancestor();
 					std::any added = setup(state);
@@ -64,7 +64,7 @@ namespace BDD_Runtime
 			constexpr bool takesNothing = std::is_invocable_v<Callable&>;
 			constexpr bool takesState   = std::is_invocable_v<Callable&, State&>;
 			static_assert(takesNothing || takesState || std::tuple_size_v<typename Traits<Callable>::Params> == 1, "a step takes no parameter, the State, or one typed value");
-			return [callable](State& state) mutable -> std::any
+			return [callable=std::move(callable)](State& state) mutable -> std::any
 				{
 					auto run = [&callable](auto&&... args) -> std::any
 						{
