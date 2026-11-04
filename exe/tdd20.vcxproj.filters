@@ -63,5 +63,8 @@
     <ClCompile Include="..\Client Extensions\BDD_RSpec.cpp">
       <Filter>Client Extensions</Filter>
     </ClCompile>
+    <ClCompile Include="..\Client Extensions\BDD_RunTime.cpp">
+      <Filter>Client Extensions</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
